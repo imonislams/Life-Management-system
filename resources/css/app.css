@@ -10,7 +10,9 @@
     --sidebar-width: 260px;
     --topbar-height: 64px;
     --danger-color: #ef4444;
+    --danger-hover: #dc2626;
     --success-color: #22c55e;
+    --secondary-color: #f1f5f9;
 }
 
 * {
@@ -149,10 +151,16 @@ body {
     margin-bottom: 1.5rem;
 }
 
+.card-header-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
 .card-title {
     font-size: 1.5rem;
     font-weight: 600;
-    margin-bottom: 0.5rem;
     color: var(--text-main);
 }
 
@@ -173,6 +181,144 @@ body {
     color: var(--text-muted);
     font-style: italic;
     margin-top: 0.5rem;
+}
+
+/* Filters & Forms */
+.filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: flex-end;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background-color: #f8fafc;
+    border: 1px solid var(--border-color);
+    border-radius: 0.375rem;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.filter-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+/* Data Table */
+.data-table-container {
+    overflow-x: auto;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 0.875rem;
+}
+
+.data-table th {
+    background-color: #f8fafc;
+    color: var(--text-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.data-table td {
+    padding: 0.875rem 1rem;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-main);
+}
+
+.data-table tbody tr:hover {
+    background-color: #f8fafc;
+}
+
+.badge {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background-color: #e2e8f0;
+    color: #334155;
+}
+
+.text-amount-income {
+    font-weight: 600;
+    color: #16a34a;
+}
+
+.text-amount-expense {
+    font-weight: 600;
+    color: #dc2626;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    border-radius: 0.25rem;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.btn-secondary {
+    background-color: var(--secondary-color);
+    color: var(--text-main);
+    border: 1px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+    background-color: #e2e8f0;
+}
+
+.btn-danger-sm {
+    background-color: #fef2f2;
+    color: var(--danger-color);
+    border: 1px solid #fecaca;
+}
+
+.btn-danger-sm:hover {
+    background-color: #fee2e2;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--text-muted);
+}
+
+.empty-state-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--text-main);
+}
+
+/* Pagination */
+.pagination-wrapper {
+    margin-top: 1.5rem;
+    display: flex;
+    justify-content: center;
+}
+
+.pagination-wrapper nav {
+    display: flex;
+    gap: 0.25rem;
 }
 
 /* Auth Pages Styling */
@@ -250,6 +396,7 @@ body {
     font-size: 0.875rem;
     font-weight: 600;
     cursor: pointer;
+    text-decoration: none;
     transition: background-color 0.15s;
 }
 
