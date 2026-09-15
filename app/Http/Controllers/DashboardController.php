@@ -35,7 +35,26 @@ class DashboardController extends Controller
 
         $remainingBalance = $totalIncome - $totalExpenses;
 
-        // 2. Monthly Income vs Expense Chart (Last 6 Months)
+        // 2. Savings Goal Summary
+        $savingsGoal = $user->savingsGoal;
+        $savingsSummary = null;
+
+        if ($savingsGoal) {
+            $target = (float) $savingsGoal->target_amount;
+            $current = (float) $savingsGoal->current_amount;
+            $remaining = max(0, $target - $current);
+            $progress = $target > 0 ? min(100, round(($current / $target) * 100, 2)) : 0;
+
+            $savingsSummary = [
+                'name' => $savingsGoal->name,
+                'target_amount' => $target,
+                'current_amount' => $current,
+                'remaining_amount' => $remaining,
+                'progress_percentage' => $progress,
+            ];
+        }
+
+        // 3. Monthly Income vs Expense Chart (Last 6 Months)
         $monthlyChartLabels = [];
         $monthlyIncomeData = [];
         $monthlyExpenseData = [];
@@ -64,7 +83,7 @@ class DashboardController extends Controller
             $monthlyExpenseData[] = $mExpenses;
         }
 
-        // 3. Recent Transactions
+        // 4. Recent Transactions
         $recentIncome = $user->incomeRecords()
             ->orderBy('date', 'desc')
             ->orderBy('id', 'desc')
@@ -83,6 +102,7 @@ class DashboardController extends Controller
             'totalIncome' => $totalIncome,
             'totalExpenses' => $totalExpenses,
             'remainingBalance' => $remainingBalance,
+            'savingsSummary' => $savingsSummary,
             'monthlyChartLabels' => $monthlyChartLabels,
             'monthlyIncomeData' => $monthlyIncomeData,
             'monthlyExpenseData' => $monthlyExpenseData,

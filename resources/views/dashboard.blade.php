@@ -36,6 +36,34 @@
         </div>
     </div>
 
+    <!-- Savings Goal Summary Card -->
+    @if ($savingsSummary)
+        <div class="card" style="margin-bottom: 1.5rem;">
+            <div class="card-header-flex" style="margin-bottom: 0.5rem;">
+                <div>
+                    <h2 class="card-title">Savings Goal: {{ $savingsSummary['name'] }}</h2>
+                    <p class="card-subtitle">Target: ৳ {{ number_format($savingsSummary['target_amount'], 2) }} TK</p>
+                </div>
+                <a href="{{ route('savings.index') }}" class="btn-secondary btn-sm">Manage Savings</a>
+            </div>
+
+            <div style="display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: center; margin-top: 0.5rem;">
+                <div style="flex: 1; min-width: 200px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem; font-size: 0.875rem; font-weight: 600;">
+                        <span>Progress: {{ $savingsSummary['progress_percentage'] }}%</span>
+                        <span>Saved: ৳ {{ number_format($savingsSummary['current_amount'], 2) }} TK</span>
+                    </div>
+                    <div style="background-color: #e2e8f0; border-radius: 0.375rem; height: 10px; overflow: hidden;">
+                        <div style="width: {{ $savingsSummary['progress_percentage'] }}%; background-color: var(--primary-color); height: 100%;"></div>
+                    </div>
+                </div>
+                <div style="font-size: 0.875rem; color: var(--text-muted); font-weight: 500;">
+                    Remaining: ৳ {{ number_format($savingsSummary['remaining_amount'], 2) }} TK
+                </div>
+            </div>
+        </div>
+    @endif
+
     <!-- Monthly Income vs Expense Chart -->
     <div class="card" style="margin-bottom: 1.5rem;">
         <h2 class="card-title" style="margin-bottom: 1rem;">Income vs Expense</h2>
