@@ -36,37 +36,19 @@
         </div>
     </div>
 
-    <!-- Charts Section -->
-    <div class="dashboard-charts-grid">
-        <!-- Monthly Income vs Expense Chart -->
-        <div class="card">
-            <h2 class="card-title" style="margin-bottom: 1rem;">Income vs Expenses (Last 6 Months)</h2>
-            @if (array_sum($monthlyIncomeData) > 0 || array_sum($monthlyExpenseData) > 0)
-                <div class="chart-container">
-                    <canvas id="monthlyChart"></canvas>
-                </div>
-            @else
-                <div class="empty-state">
-                    <div class="empty-state-title">No data available for this chart</div>
-                    <p>Add income or expense records to view monthly comparison.</p>
-                </div>
-            @endif
-        </div>
-
-        <!-- Expense Category Chart -->
-        <div class="card">
-            <h2 class="card-title" style="margin-bottom: 1rem;">Expense Distribution by Category</h2>
-            @if (count($categoryData) > 0 && array_sum($categoryData) > 0)
-                <div class="chart-container">
-                    <canvas id="categoryChart"></canvas>
-                </div>
-            @else
-                <div class="empty-state">
-                    <div class="empty-state-title">No data available for this chart</div>
-                    <p>Add expense records with categories to view distribution.</p>
-                </div>
-            @endif
-        </div>
+    <!-- Monthly Income vs Expense Chart -->
+    <div class="card" style="margin-bottom: 1.5rem;">
+        <h2 class="card-title" style="margin-bottom: 1rem;">Income vs Expenses (Last 6 Months)</h2>
+        @if (array_sum($monthlyIncomeData) > 0 || array_sum($monthlyExpenseData) > 0)
+            <div class="chart-container">
+                <canvas id="monthlyChart"></canvas>
+            </div>
+        @else
+            <div class="empty-state">
+                <div class="empty-state-title">No data available for this chart</div>
+                <p>Add income or expense records to view monthly comparison.</p>
+            </div>
+        @endif
     </div>
 
     <!-- Recent Transactions Grid -->
@@ -119,7 +101,6 @@
                         <thead>
                             <tr>
                                 <th>Date</th>
-                                <th>Category</th>
                                 <th>Amount</th>
                                 <th>Description</th>
                             </tr>
@@ -128,9 +109,6 @@
                             @foreach ($recentExpenses as $exp)
                                 <tr>
                                     <td>{{ \Carbon\Carbon::parse($exp->date)->format('M d, Y') }}</td>
-                                    <td>
-                                        <span class="badge">{{ $exp->category->name ?? 'Uncategorized' }}</span>
-                                    </td>
                                     <td class="text-amount-expense">৳ {{ number_format($exp->amount, 2) }} TK</td>
                                     <td>{{ $exp->description ?? '-' }}</td>
                                 </tr>
@@ -146,7 +124,7 @@
         </div>
     </div>
 
-    <!-- Load Chart.js CDN for interactive charts -->
+    <!-- Load Chart.js CDN for interactive chart -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
@@ -180,31 +158,6 @@
                         },
                         scales: {
                             y: { beginAtZero: true }
-                        }
-                    }
-                });
-            }
-
-            // Category Doughnut Chart
-            const categoryCanvas = document.getElementById('categoryChart');
-            if (categoryCanvas) {
-                new Chart(categoryCanvas.getContext('2d'), {
-                    type: 'doughnut',
-                    data: {
-                        labels: @json($categoryLabels),
-                        datasets: [{
-                            data: @json($categoryData),
-                            backgroundColor: [
-                                '#3b82f6', '#ef4444', '#10b981', '#f59e0b',
-                                '#8b5cf6', '#ec4899', '#6366f1', '#64748b'
-                            ]
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: { position: 'right' }
                         }
                     }
                 });

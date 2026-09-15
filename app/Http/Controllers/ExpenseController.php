@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ExpenseCategory;
 use App\Models\ExpenseRecord;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,7 +13,7 @@ class ExpenseController extends Controller
      */
     public function index(Request $request)
     {
-        $query = $request->user()->expenseRecords()->with('category');
+        $query = $request->user()->expenseRecords();
 
         // Filter by specific date
         if ($request->filled('date')) {
@@ -30,21 +29,13 @@ class ExpenseController extends Controller
             }
         }
 
-        // Filter by category
-        if ($request->filled('category_id')) {
-            $query->where('expense_category_id', $request->input('category_id'));
-        }
-
         $expenseRecords = $query->orderBy('date', 'desc')
                                ->orderBy('id', 'desc')
                                ->paginate(10)
                                ->withQueryString();
 
-        $categories = ExpenseCategory::orderBy('name')->get();
-
         return view('expenses.index', [
             'expenseRecords' => $expenseRecords,
-            'categories' => $categories,
         ]);
     }
 
@@ -53,11 +44,7 @@ class ExpenseController extends Controller
      */
     public function create()
     {
-        $categories = ExpenseCategory::orderBy('name')->get();
-
-        return view('expenses.create', [
-            'categories' => $categories,
-        ]);
+        return view('expenses.create');
     }
 
     /**
@@ -66,13 +53,9 @@ class ExpenseController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'expense_category_id' => ['required', 'exists:expense_categories,id'],
             'amount' => ['required', 'numeric', 'gt:0', 'max:999999999.99'],
             'date' => ['required', 'date'],
             'description' => ['nullable', 'string', 'max:255'],
-        ], [
-            'expense_category_id.required' => 'Please select an expense category.',
-            'expense_category_id.exists' => 'The selected category is invalid.',
         ]);
 
         $request->user()->expenseRecords()->create($validated);
@@ -90,11 +73,8 @@ class ExpenseController extends Controller
             abort(403);
         }
 
-        $categories = ExpenseCategory::orderBy('name')->get();
-
         return view('expenses.edit', [
             'expense' => $expense,
-            'categories' => $categories,
         ]);
     }
 
@@ -109,13 +89,9 @@ class ExpenseController extends Controller
         }
 
         $validated = $request->validate([
-            'expense_category_id' => ['required', 'exists:expense_categories,id'],
             'amount' => ['required', 'numeric', 'gt:0', 'max:999999999.99'],
             'date' => ['required', 'date'],
             'description' => ['nullable', 'string', 'max:255'],
-        ], [
-            'expense_category_id.required' => 'Please select an expense category.',
-            'expense_category_id.exists' => 'The selected category is invalid.',
         ]);
 
         $expense->update($validated);

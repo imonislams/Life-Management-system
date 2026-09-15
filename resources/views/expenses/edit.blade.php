@@ -11,21 +11,6 @@
             @method('PUT')
 
             <div class="form-group">
-                <label for="expense_category_id" class="form-label">Category</label>
-                <select id="expense_category_id" name="expense_category_id" required autofocus class="form-control">
-                    <option value="">Select a Category</option>
-                    @foreach ($categories as $cat)
-                        <option value="{{ $cat->id }}" {{ old('expense_category_id', $expense->expense_category_id) == $cat->id ? 'selected' : '' }}>
-                            {{ $cat->name }}
-                        </option>
-                    @endforeach
-                </select>
-                @error('expense_category_id')
-                    <div class="error-msg">{{ $message }}</div>
-                @enderror
-            </div>
-
-            <div class="form-group">
                 <label for="amount" class="form-label">Amount (TK)</label>
                 <input
                     id="amount"
@@ -35,6 +20,7 @@
                     name="amount"
                     value="{{ old('amount', $expense->amount) }}"
                     required
+                    autofocus
                     class="form-control"
                 >
                 @error('amount')

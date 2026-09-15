@@ -45,21 +45,9 @@
                 >
             </div>
 
-            <div class="filter-group">
-                <label for="category_id" class="filter-label">Category</label>
-                <select id="category_id" name="category_id" class="form-control" style="width: 160px;">
-                    <option value="">All Categories</option>
-                    @foreach ($categories as $cat)
-                        <option value="{{ $cat->id }}" {{ request('category_id') == $cat->id ? 'selected' : '' }}>
-                            {{ $cat->name }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-
             <div class="filter-group" style="flex-direction: row; gap: 0.5rem; align-items: flex-end;">
                 <button type="submit" class="btn-primary" style="padding: 0.625rem 0.875rem;">Filter</button>
-                @if(request('month') || request('date') || request('category_id'))
+                @if(request('month') || request('date'))
                     <a href="{{ route('expenses.index') }}" class="btn-secondary btn-sm" style="padding: 0.625rem 0.875rem;">Clear</a>
                 @endif
             </div>
@@ -72,7 +60,6 @@
                     <thead>
                         <tr>
                             <th>Date</th>
-                            <th>Category</th>
                             <th>Amount</th>
                             <th>Description</th>
                             <th style="text-align: right;">Actions</th>
@@ -82,9 +69,6 @@
                         @foreach ($expenseRecords as $expense)
                             <tr>
                                 <td>{{ \Carbon\Carbon::parse($expense->date)->format('M d, Y') }}</td>
-                                <td>
-                                    <span class="badge">{{ $expense->category->name ?? 'Uncategorized' }}</span>
-                                </td>
                                 <td class="text-amount-expense">৳ {{ number_format($expense->amount, 2) }} TK</td>
                                 <td>{{ $expense->description ?? '-' }}</td>
                                 <td style="text-align: right;">
