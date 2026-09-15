@@ -40,6 +40,7 @@ Route::middleware('auth')->group(function () {
     // Savings routes
     Route::get('/savings', [SavingsController::class, 'index'])->name('savings.index');
     Route::post('/savings', [SavingsController::class, 'storeOrUpdate'])->name('savings.store');
+    Route::post('/savings/add-money', [SavingsController::class, 'addMoney'])->name('savings.add-money');
 
     // Income resource routes
     Route::resource('income', IncomeController::class)->except(['show']);

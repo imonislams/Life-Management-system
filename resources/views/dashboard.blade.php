@@ -8,7 +8,7 @@
         <p class="card-subtitle">Welcome, {{ Auth::user()->name }}</p>
     </div>
 
-    <!-- 5 Summary Cards Grid -->
+    <!-- 6 Summary Cards Grid -->
     <div class="dashboard-grid-5">
         <div class="summary-card">
             <div class="summary-card-title">Monthly Salary</div>
@@ -31,8 +31,13 @@
         </div>
 
         <div class="summary-card">
-            <div class="summary-card-title">Remaining Balance</div>
-            <div class="summary-card-value balance-color">৳ {{ number_format($remainingBalance, 2) }} TK</div>
+            <div class="summary-card-title">Total Savings</div>
+            <div class="summary-card-value" style="color: #2563eb;">৳ {{ number_format($totalSavings, 2) }} TK</div>
+        </div>
+
+        <div class="summary-card">
+            <div class="summary-card-title">Available Balance</div>
+            <div class="summary-card-value balance-color">৳ {{ number_format($availableBalance, 2) }} TK</div>
         </div>
     </div>
 
