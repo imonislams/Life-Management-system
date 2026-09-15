@@ -69,6 +69,54 @@
         </div>
     @endif
 
+    <!-- Upcoming Recurring Finance Card -->
+    <div class="card" style="margin-bottom: 1.5rem;">
+        <div class="card-header-flex">
+            <div>
+                <h2 class="card-title">Upcoming Recurring Finance</h2>
+                <p class="card-subtitle">Scheduled active recurring income and expenses.</p>
+            </div>
+            <a href="{{ route('recurring-transactions.index') }}" class="btn-secondary btn-sm">Manage Recurring</a>
+        </div>
+
+        @if ($upcomingRecurring->count() > 0)
+            <div class="data-table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Type</th>
+                            <th>Amount</th>
+                            <th>Next Due Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($upcomingRecurring as $item)
+                            <tr>
+                                <td><strong>{{ $item->title }}</strong></td>
+                                <td>
+                                    @if ($item->type === 'income')
+                                        <span class="badge badge-income">Income</span>
+                                    @else
+                                        <span class="badge badge-expense">Expense</span>
+                                    @endif
+                                </td>
+                                <td class="{{ $item->type === 'income' ? 'text-amount-income' : 'text-amount-expense' }}">
+                                    ৳ {{ number_format($item->amount, 2) }} TK
+                                </td>
+                                <td>{{ \Carbon\Carbon::parse($item->next_due_date)->format('M d, Y') }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        @else
+            <div class="empty-state" style="padding: 1.5rem 1rem;">
+                <div class="empty-state-title">No upcoming active recurring records found.</div>
+            </div>
+        @endif
+    </div>
+
     <!-- Monthly Income vs Expense Chart -->
     <div class="card" style="margin-bottom: 1.5rem;">
         <h2 class="card-title" style="margin-bottom: 1rem;">Income vs Expense</h2>

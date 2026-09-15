@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\IncomeController;
+use App\Http\Controllers\RecurringTransactionController;
 use App\Http\Controllers\SalaryController;
 use App\Http\Controllers\SavingsController;
 use Illuminate\Support\Facades\Auth;
@@ -47,4 +48,7 @@ Route::middleware('auth')->group(function () {
 
     // Expense resource routes
     Route::resource('expenses', ExpenseController::class)->except(['show']);
+
+    // Recurring Transactions resource routes
+    Route::resource('recurring-transactions', RecurringTransactionController::class)->except(['show']);
 });

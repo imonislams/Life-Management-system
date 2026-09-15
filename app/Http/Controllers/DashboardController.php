@@ -96,6 +96,12 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
+        // 5. Upcoming Active Recurring Transactions
+        $upcomingRecurring = $user->recurringTransactions()
+            ->where('is_active', true)
+            ->orderBy('next_due_date', 'asc')
+            ->get();
+
         return view('dashboard', [
             'monthlySalary' => $monthlySalary,
             'additionalIncome' => $additionalIncome,
@@ -109,6 +115,7 @@ class DashboardController extends Controller
             'monthlyExpenseData' => $monthlyExpenseData,
             'recentIncome' => $recentIncome,
             'recentExpenses' => $recentExpenses,
+            'upcomingRecurring' => $upcomingRecurring,
         ]);
     }
 }
