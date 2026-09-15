@@ -1,5 +1,5 @@
 <x-app-layout>
-    <x-slot name="title">Income - Personal Life Management System</x-slot>
+    <x-slot name="title">Income - Personal Finance Management System</x-slot>
     <x-slot name="pageTitle">Income</x-slot>
 
     @if (session('status'))
@@ -11,8 +11,8 @@
     <div class="card">
         <div class="card-header-flex">
             <div>
-                <h1 class="card-title">Income Management</h1>
-                <p class="card-subtitle">Track and organize your income sources</p>
+                <h1 class="card-title">Income</h1>
+                <p class="card-subtitle">Manage your income records.</p>
             </div>
             <div>
                 <a href="{{ route('income.create') }}" class="btn-primary">+ Add Income</a>
@@ -92,8 +92,8 @@
             </div>
         @else
             <div class="empty-state">
-                <div class="empty-state-title">No income records found</div>
-                <p>Add your first income record or adjust your filter parameters.</p>
+                <div class="empty-state-title">No income records found.</div>
+                <p>Add your first income record to get started.</p>
             </div>
         @endif
     </div>

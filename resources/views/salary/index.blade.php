@@ -1,5 +1,5 @@
 <x-app-layout>
-    <x-slot name="title">Salary - Personal Life Management System</x-slot>
+    <x-slot name="title">Salary - Personal Finance Management System</x-slot>
     <x-slot name="pageTitle">Salary</x-slot>
 
     @if (session('status'))
@@ -8,8 +8,13 @@
         </div>
     @endif
 
-    <div class="card">
-        <h2 class="card-title">Current Monthly Salary</h2>
+    <div class="card" style="margin-bottom: 1.5rem;">
+        <h1 class="card-title">Salary</h1>
+        <p class="card-subtitle">Manage your monthly salary.</p>
+    </div>
+
+    <div class="card" style="margin-bottom: 1.5rem;">
+        <h2 class="card-title">Monthly Salary</h2>
         @if ($salary !== null)
             <div class="salary-display-value">
                 ৳ {{ number_format($salary, 2) }} TK
@@ -27,7 +32,7 @@
             @csrf
 
             <div class="form-group">
-                <label for="salary" class="form-label">Monthly Salary (TK)</label>
+                <label for="salary" class="form-label">Monthly Salary Amount (TK)</label>
                 <input
                     id="salary"
                     type="number"
@@ -45,7 +50,7 @@
             </div>
 
             <button type="submit" class="btn-primary">
-                {{ $salary !== null ? 'Save Salary' : 'Save Salary' }}
+                {{ $salary !== null ? 'Update Salary' : 'Save Salary' }}
             </button>
         </form>
     </div>
