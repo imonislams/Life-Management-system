@@ -33,11 +33,14 @@
                     <a href="{{ route('income.index') }}" class="nav-link {{ request()->routeIs('income.*') ? 'active' : '' }}">
                         <span class="nav-icon">📈</span> Income
                     </a>
+                    <a href="{{ route('expenses.index') }}" class="nav-link {{ request()->routeIs('expenses.*') ? 'active' : '' }}">
+                        <span class="nav-icon">📉</span> Expense
+                    </a>
                     <a href="{{ route('salary.index') }}" class="nav-link {{ request()->routeIs('salary.*') ? 'active' : '' }}">
                         <span class="nav-icon">💵</span> Salary
                     </a>
-                    <a href="{{ route('expenses.index') }}" class="nav-link {{ request()->routeIs('expenses.*') ? 'active' : '' }}">
-                        <span class="nav-icon">📉</span> Expense
+                    <a href="{{ route('savings.index') }}" class="nav-link {{ request()->routeIs('savings.*') ? 'active' : '' }}">
+                        <span class="nav-icon">🏦</span> Savings
                     </a>
                 </div>
             </nav>

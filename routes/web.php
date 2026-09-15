@@ -6,6 +6,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\IncomeController;
 use App\Http\Controllers\SalaryController;
+use App\Http\Controllers\SavingsController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -35,6 +36,10 @@ Route::middleware('auth')->group(function () {
     // Salary routes
     Route::get('/salary', [SalaryController::class, 'index'])->name('salary.index');
     Route::post('/salary', [SalaryController::class, 'update'])->name('salary.update');
+
+    // Savings routes
+    Route::get('/savings', [SavingsController::class, 'index'])->name('savings.index');
+    Route::post('/savings', [SavingsController::class, 'storeOrUpdate'])->name('savings.store');
 
     // Income resource routes
     Route::resource('income', IncomeController::class)->except(['show']);
