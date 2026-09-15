@@ -1,8 +1,9 @@
 <x-app-layout>
-    <x-slot name="title">Add Expense - Personal Finance Management System</x-slot>
+    <x-slot name="title">Add Expense - Personal Life Management System</x-slot>
+    <x-slot name="pageTitle">Expenses</x-slot>
 
     <div class="card" style="max-width: 600px; margin: 0 auto;">
-        <h1 class="card-title">Add Expense</h1>
+        <h1 class="card-title">Add New Expense</h1>
         <p class="card-subtitle" style="margin-bottom: 1.5rem;">Enter details for your new expense record</p>
 
         <form method="POST" action="{{ route('expenses.store') }}">
