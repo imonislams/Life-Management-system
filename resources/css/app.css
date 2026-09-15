@@ -159,14 +159,14 @@ body {
 }
 
 .card-title {
-    font-size: 1.5rem;
+    font-size: 1.25rem;
     font-weight: 600;
     color: var(--text-main);
 }
 
 .card-subtitle {
     color: var(--text-muted);
-    font-size: 1rem;
+    font-size: 0.875rem;
 }
 
 .salary-display-value {
@@ -181,6 +181,70 @@ body {
     color: var(--text-muted);
     font-style: italic;
     margin-top: 0.5rem;
+}
+
+/* Dashboard Summary Cards Grid */
+.dashboard-grid-5 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 1.5rem;
+}
+
+.summary-card {
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    padding: 1.25rem;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+}
+
+.summary-card-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    margin-bottom: 0.5rem;
+}
+
+.summary-card-value {
+    font-size: 1.375rem;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.summary-card-value.income-color {
+    color: #16a34a;
+}
+
+.summary-card-value.expense-color {
+    color: #dc2626;
+}
+
+.summary-card-value.balance-color {
+    color: var(--primary-color);
+}
+
+/* Dashboard Charts Grid */
+.dashboard-charts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.chart-container {
+    position: relative;
+    width: 100%;
+    height: 280px;
+}
+
+/* Dashboard Transactions Grid */
+.dashboard-tx-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1.5rem;
 }
 
 /* Filters & Forms */
@@ -298,14 +362,14 @@ body {
 
 .empty-state {
     text-align: center;
-    padding: 3rem 1rem;
+    padding: 2.5rem 1rem;
     color: var(--text-muted);
 }
 
 .empty-state-title {
-    font-size: 1.125rem;
+    font-size: 1rem;
     font-weight: 600;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.25rem;
     color: var(--text-main);
 }
 
