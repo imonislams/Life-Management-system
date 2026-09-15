@@ -11,7 +11,7 @@
         <h2 class="card-title">Current Monthly Salary</h2>
         @if ($salary !== null)
             <div class="salary-display-value">
-                ${{ number_format($salary, 2) }}
+                ৳ {{ number_format($salary, 2) }} TK
             </div>
         @else
             <div class="salary-empty-state">
@@ -26,7 +26,7 @@
             @csrf
 
             <div class="form-group">
-                <label for="salary" class="form-label">Monthly Salary</label>
+                <label for="salary" class="form-label">Monthly Salary (TK)</label>
                 <input
                     id="salary"
                     type="number"
@@ -36,7 +36,7 @@
                     value="{{ old('salary', $salary) }}"
                     required
                     class="form-control"
-                    placeholder="e.g. 5000.00"
+                    placeholder="e.g. 50000.00"
                 >
                 @error('salary')
                     <div class="error-msg">{{ $message }}</div>
