@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\ExpenseController;
+use App\Http\Controllers\IncomeController;
 use App\Http\Controllers\SalaryController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -35,12 +37,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/salary', [SalaryController::class, 'index'])->name('salary.index');
     Route::post('/salary', [SalaryController::class, 'update'])->name('salary.update');
 
-    // Placeholders for future phases
-    Route::get('/income', function () {
-        return view('income.index');
-    })->name('income.index');
+    // Income resource routes
+    Route::resource('income', IncomeController::class)->except(['show']);
 
-    Route::get('/expenses', function () {
-        return view('expenses.index');
-    })->name('expenses.index');
+    // Expense resource routes
+    Route::resource('expenses', ExpenseController::class)->except(['show']);
 });
