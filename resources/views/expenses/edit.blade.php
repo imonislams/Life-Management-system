@@ -1,8 +1,9 @@
 <x-app-layout>
-    <x-slot name="title">Edit Expense - Personal Finance Management System</x-slot>
+    <x-slot name="title">Edit Expense - Personal Life Management System</x-slot>
+    <x-slot name="pageTitle">Expenses</x-slot>
 
     <div class="card" style="max-width: 600px; margin: 0 auto;">
-        <h1 class="card-title">Edit Expense</h1>
+        <h1 class="card-title">Edit Expense Record</h1>
         <p class="card-subtitle" style="margin-bottom: 1.5rem;">Update details for this expense record</p>
 
         <form method="POST" action="{{ route('expenses.update', $expense) }}">

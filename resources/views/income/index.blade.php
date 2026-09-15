@@ -1,5 +1,6 @@
 <x-app-layout>
-    <x-slot name="title">Income - Personal Finance Management System</x-slot>
+    <x-slot name="title">Income - Personal Life Management System</x-slot>
+    <x-slot name="pageTitle">Income</x-slot>
 
     @if (session('status'))
         <div class="alert-success">
@@ -10,11 +11,11 @@
     <div class="card">
         <div class="card-header-flex">
             <div>
-                <h1 class="card-title">Income History</h1>
-                <p class="card-subtitle">Manage your income transactions</p>
+                <h1 class="card-title">Income Management</h1>
+                <p class="card-subtitle">Track and organize your income sources</p>
             </div>
             <div>
-                <a href="{{ route('income.create') }}" class="btn-primary">Add Income</a>
+                <a href="{{ route('income.create') }}" class="btn-primary">+ Add Income</a>
             </div>
         </div>
 

@@ -1,10 +1,11 @@
 <x-app-layout>
-    <x-slot name="title">Dashboard - Personal Finance Management System</x-slot>
+    <x-slot name="title">Dashboard - Personal Life Management System</x-slot>
+    <x-slot name="pageTitle">Dashboard</x-slot>
 
     <!-- Header Panel -->
     <div class="card" style="margin-bottom: 1.5rem;">
-        <h1 class="card-title">Personal Finance Management System</h1>
-        <p class="card-subtitle">Welcome, {{ Auth::user()->name }}</p>
+        <h1 class="card-title">Personal Life Management System</h1>
+        <p class="card-subtitle">Welcome back, {{ Auth::user()->name }}</p>
     </div>
 
     <!-- 5 Summary Cards Grid -->

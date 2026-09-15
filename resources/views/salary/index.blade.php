@@ -1,5 +1,6 @@
 <x-app-layout>
-    <x-slot name="title">Salary - Personal Finance Management System</x-slot>
+    <x-slot name="title">Salary - Personal Life Management System</x-slot>
+    <x-slot name="pageTitle">Salary</x-slot>
 
     @if (session('status'))
         <div class="alert-success">
@@ -21,7 +22,7 @@
     </div>
 
     <div class="card">
-        <h2 class="card-title">{{ $salary !== null ? 'Update Salary' : 'Set Salary' }}</h2>
+        <h2 class="card-title">{{ $salary !== null ? 'Update Monthly Salary' : 'Set Monthly Salary' }}</h2>
         <form method="POST" action="{{ route('salary.update') }}" style="max-width: 400px; margin-top: 1rem;">
             @csrf
 
@@ -44,7 +45,7 @@
             </div>
 
             <button type="submit" class="btn-primary">
-                {{ $salary !== null ? 'Update Salary' : 'Save Salary' }}
+                {{ $salary !== null ? 'Save Salary' : 'Save Salary' }}
             </button>
         </form>
     </div>
