@@ -1,11 +1,11 @@
 <x-app-layout>
-    <x-slot name="title">Dashboard - Personal Life Management System</x-slot>
+    <x-slot name="title">Dashboard - Personal Finance Management System</x-slot>
     <x-slot name="pageTitle">Dashboard</x-slot>
 
     <!-- Header Panel -->
     <div class="card" style="margin-bottom: 1.5rem;">
-        <h1 class="card-title">Personal Life Management System</h1>
-        <p class="card-subtitle">Welcome back, {{ Auth::user()->name }}</p>
+        <h1 class="card-title">Personal Finance Management System</h1>
+        <p class="card-subtitle">Welcome, {{ Auth::user()->name }}</p>
     </div>
 
     <!-- 5 Summary Cards Grid -->
@@ -38,20 +38,20 @@
 
     <!-- Monthly Income vs Expense Chart -->
     <div class="card" style="margin-bottom: 1.5rem;">
-        <h2 class="card-title" style="margin-bottom: 1rem;">Income vs Expenses (Last 6 Months)</h2>
+        <h2 class="card-title" style="margin-bottom: 1rem;">Income vs Expense</h2>
         @if (array_sum($monthlyIncomeData) > 0 || array_sum($monthlyExpenseData) > 0)
             <div class="chart-container">
                 <canvas id="monthlyChart"></canvas>
             </div>
         @else
             <div class="empty-state">
-                <div class="empty-state-title">No data available for this chart</div>
-                <p>Add income or expense records to view monthly comparison.</p>
+                <div class="empty-state-title">No financial data available for chart</div>
+                <p>Add income or expense records to view comparison.</p>
             </div>
         @endif
     </div>
 
-    <!-- Recent Transactions Grid -->
+    <!-- Recent Activity Grid -->
     <div class="dashboard-tx-grid">
         <!-- Recent Income -->
         <div class="card">
@@ -83,7 +83,7 @@
                 </div>
             @else
                 <div class="empty-state">
-                    <div class="empty-state-title">No income records yet.</div>
+                    <div class="empty-state-title">No recent income records found.</div>
                 </div>
             @endif
         </div>
@@ -118,7 +118,7 @@
                 </div>
             @else
                 <div class="empty-state">
-                    <div class="empty-state-title">No expense records yet.</div>
+                    <div class="empty-state-title">No recent expense records found.</div>
                 </div>
             @endif
         </div>
@@ -128,7 +128,6 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            // Monthly Bar Chart
             const monthlyCanvas = document.getElementById('monthlyChart');
             if (monthlyCanvas) {
                 new Chart(monthlyCanvas.getContext('2d'), {
@@ -143,7 +142,7 @@
                                 borderRadius: 4
                             },
                             {
-                                label: 'Expenses (TK)',
+                                label: 'Total Expenses (TK)',
                                 data: @json($monthlyExpenseData),
                                 backgroundColor: '#ef4444',
                                 borderRadius: 4

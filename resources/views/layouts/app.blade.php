@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ $title ?? 'Personal Life Management System' }}</title>
+    <title>{{ $title ?? 'Personal Finance Management System' }}</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body>
@@ -33,61 +33,12 @@
                     <a href="{{ route('income.index') }}" class="nav-link {{ request()->routeIs('income.*') ? 'active' : '' }}">
                         <span class="nav-icon">📈</span> Income
                     </a>
-                    <a href="{{ route('expenses.index') }}" class="nav-link {{ request()->routeIs('expenses.*') ? 'active' : '' }}">
-                        <span class="nav-icon">📉</span> Expenses
-                    </a>
                     <a href="{{ route('salary.index') }}" class="nav-link {{ request()->routeIs('salary.*') ? 'active' : '' }}">
                         <span class="nav-icon">💵</span> Salary
                     </a>
-                    <div class="nav-link disabled">
-                        <span class="nav-icon">🏦</span> Savings <span class="nav-badge">Soon</span>
-                    </div>
-                </div>
-
-                <!-- Daily Life -->
-                <div class="nav-section">
-                    <div class="nav-section-title">Daily Life</div>
-                    <div class="nav-link disabled">
-                        <span class="nav-icon">📅</span> Routine <span class="nav-badge">Soon</span>
-                    </div>
-                    <div class="nav-link disabled">
-                        <span class="nav-icon">✅</span> Tasks <span class="nav-badge">Soon</span>
-                    </div>
-                    <div class="nav-link disabled">
-                        <span class="nav-icon">🎯</span> Goals <span class="nav-badge">Soon</span>
-                    </div>
-                </div>
-
-                <!-- Habits -->
-                <div class="nav-section">
-                    <div class="nav-section-title">Habits</div>
-                    <div class="nav-link disabled">
-                        <span class="nav-icon">🔥</span> Habits <span class="nav-badge">Soon</span>
-                    </div>
-                </div>
-
-                <!-- Prayer -->
-                <div class="nav-section">
-                    <div class="nav-section-title">Prayer</div>
-                    <div class="nav-link disabled">
-                        <span class="nav-icon">🕌</span> Prayer Tracking <span class="nav-badge">Soon</span>
-                    </div>
-                </div>
-
-                <!-- Reminders -->
-                <div class="nav-section">
-                    <div class="nav-section-title">Reminders</div>
-                    <div class="nav-link disabled">
-                        <span class="nav-icon">🔔</span> Reminders <span class="nav-badge">Soon</span>
-                    </div>
-                </div>
-
-                <!-- Special Days -->
-                <div class="nav-section">
-                    <div class="nav-section-title">Special Days</div>
-                    <div class="nav-link disabled">
-                        <span class="nav-icon">🎉</span> Special Days <span class="nav-badge">Soon</span>
-                    </div>
+                    <a href="{{ route('expenses.index') }}" class="nav-link {{ request()->routeIs('expenses.*') ? 'active' : '' }}">
+                        <span class="nav-icon">📉</span> Expense
+                    </a>
                 </div>
             </nav>
         </aside>

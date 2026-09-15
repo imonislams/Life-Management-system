@@ -1,4 +1,4 @@
-/* Custom Application Styling - Design System */
+/* Custom Application Styling - Personal Finance Management System */
 :root {
     --primary-color: #2563eb;
     --primary-hover: #1d4ed8;
@@ -99,7 +99,7 @@ body {
 .nav-link {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-start;
     padding: 0.625rem 0.75rem;
     color: var(--text-muted);
     text-decoration: none;
@@ -109,7 +109,7 @@ body {
     transition: background-color 0.15s, color 0.15s;
 }
 
-.nav-link:not(.disabled):hover {
+.nav-link:hover {
     background-color: #f1f5f9;
     color: var(--text-main);
 }
@@ -120,25 +120,9 @@ body {
     font-weight: 600;
 }
 
-.nav-link.disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
 .nav-icon {
     margin-right: 0.5rem;
     font-size: 0.875rem;
-}
-
-.nav-badge {
-    font-size: 0.65rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    padding: 0.125rem 0.375rem;
-    background-color: #f1f5f9;
-    color: var(--text-muted);
-    border-radius: 0.25rem;
-    border: 1px solid var(--border-color);
 }
 
 .sidebar-backdrop {
@@ -331,14 +315,6 @@ body {
     color: var(--primary-color);
 }
 
-/* Dashboard Charts Grid */
-.dashboard-charts-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 1.5rem;
-}
-
 .chart-container {
     position: relative;
     width: 100%;
@@ -409,16 +385,6 @@ body {
 
 .data-table tbody tr:hover {
     background-color: #f8fafc;
-}
-
-.badge {
-    display: inline-block;
-    padding: 0.25rem 0.5rem;
-    border-radius: 0.25rem;
-    font-size: 0.75rem;
-    font-weight: 600;
-    background-color: #e2e8f0;
-    color: #334155;
 }
 
 .text-amount-income {
