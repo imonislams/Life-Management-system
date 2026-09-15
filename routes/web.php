@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\SalaryController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -30,6 +31,10 @@ Route::middleware('auth')->group(function () {
         return view('dashboard');
     })->name('dashboard');
 
+    // Salary routes
+    Route::get('/salary', [SalaryController::class, 'index'])->name('salary.index');
+    Route::post('/salary', [SalaryController::class, 'update'])->name('salary.update');
+
     // Placeholders for future phases
     Route::get('/income', function () {
         return view('income.index');
@@ -38,8 +43,4 @@ Route::middleware('auth')->group(function () {
     Route::get('/expenses', function () {
         return view('expenses.index');
     })->name('expenses.index');
-
-    Route::get('/salary', function () {
-        return view('salary.index');
-    })->name('salary.index');
 });
