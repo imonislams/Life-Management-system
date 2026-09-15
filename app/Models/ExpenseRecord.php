@@ -12,7 +12,6 @@ class ExpenseRecord extends Model
 
     protected $fillable = [
         'user_id',
-        'expense_category_id',
         'amount',
         'date',
         'description',
@@ -29,10 +28,5 @@ class ExpenseRecord extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
-    }
-
-    public function category(): BelongsTo
-    {
-        return $this->belongsTo(ExpenseCategory::class, 'expense_category_id');
     }
 }

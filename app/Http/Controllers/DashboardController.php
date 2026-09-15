@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
@@ -65,17 +64,7 @@ class DashboardController extends Controller
             $monthlyExpenseData[] = $mExpenses;
         }
 
-        // 3. Expense Category Chart (Distribution of expenses by category)
-        $categoryDataRaw = $user->expenseRecords()
-            ->join('expense_categories', 'expense_records.expense_category_id', '=', 'expense_categories.id')
-            ->select('expense_categories.name as category_name', DB::raw('SUM(expense_records.amount) as total'))
-            ->groupBy('expense_categories.name')
-            ->get();
-
-        $categoryLabels = $categoryDataRaw->pluck('category_name')->toArray();
-        $categoryData = $categoryDataRaw->pluck('total')->map(fn($val) => (float) $val)->toArray();
-
-        // 4. Recent Transactions
+        // 3. Recent Transactions
         $recentIncome = $user->incomeRecords()
             ->orderBy('date', 'desc')
             ->orderBy('id', 'desc')
@@ -83,7 +72,6 @@ class DashboardController extends Controller
             ->get();
 
         $recentExpenses = $user->expenseRecords()
-            ->with('category')
             ->orderBy('date', 'desc')
             ->orderBy('id', 'desc')
             ->take(5)
@@ -98,8 +86,6 @@ class DashboardController extends Controller
             'monthlyChartLabels' => $monthlyChartLabels,
             'monthlyIncomeData' => $monthlyIncomeData,
             'monthlyExpenseData' => $monthlyExpenseData,
-            'categoryLabels' => $categoryLabels,
-            'categoryData' => $categoryData,
             'recentIncome' => $recentIncome,
             'recentExpenses' => $recentExpenses,
         ]);
