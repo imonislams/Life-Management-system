@@ -39,6 +39,37 @@
                 </div>
             </div>
         </div>
+
+        <!-- Add Money Card -->
+        <div class="card" style="margin-bottom: 1.5rem;">
+            <h2 class="card-title">Add Money to Savings</h2>
+            <p class="card-subtitle" style="margin-bottom: 1rem;">
+                Available Balance: <strong style="color: var(--primary-color);">৳ {{ number_format($availableBalance, 2) }} TK</strong>
+            </p>
+
+            <form id="addMoneyForm" method="POST" action="{{ route('savings.add-money') }}" style="max-width: 500px;">
+                @csrf
+                <div class="form-group">
+                    <label for="add_amount" class="form-label">Amount to Add (TK)</label>
+                    <input
+                        id="add_amount"
+                        type="number"
+                        step="0.01"
+                        min="0.01"
+                        name="amount"
+                        value="{{ old('amount') }}"
+                        required
+                        class="form-control"
+                        placeholder="e.g. 5000.00"
+                    >
+                    @error('amount')
+                        <div class="error-msg">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <button type="submit" class="btn-primary">Add to Savings</button>
+            </form>
+        </div>
     @else
         <div class="card" style="margin-bottom: 1.5rem;">
             <div class="empty-state">

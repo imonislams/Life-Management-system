@@ -33,10 +33,10 @@ class DashboardController extends Controller
             ->whereMonth('date', $currentMonth)
             ->sum('amount');
 
-        $remainingBalance = $totalIncome - $totalExpenses;
-
         // 2. Savings Goal Summary
         $savingsGoal = $user->savingsGoal;
+        $totalSavings = $savingsGoal ? (float) $savingsGoal->current_amount : 0.0;
+        $availableBalance = $totalIncome - $totalExpenses - $totalSavings;
         $savingsSummary = null;
 
         if ($savingsGoal) {
@@ -101,7 +101,8 @@ class DashboardController extends Controller
             'additionalIncome' => $additionalIncome,
             'totalIncome' => $totalIncome,
             'totalExpenses' => $totalExpenses,
-            'remainingBalance' => $remainingBalance,
+            'totalSavings' => $totalSavings,
+            'availableBalance' => $availableBalance,
             'savingsSummary' => $savingsSummary,
             'monthlyChartLabels' => $monthlyChartLabels,
             'monthlyIncomeData' => $monthlyIncomeData,
