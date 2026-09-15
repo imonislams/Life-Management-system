@@ -42,6 +42,9 @@
                     <a href="{{ route('savings.index') }}" class="nav-link {{ request()->routeIs('savings.*') ? 'active' : '' }}">
                         <span class="nav-icon">🏦</span> Savings
                     </a>
+                    <a href="{{ route('recurring-transactions.index') }}" class="nav-link {{ request()->routeIs('recurring-transactions.*') ? 'active' : '' }}">
+                        <span class="nav-icon">🔄</span> Recurring Finance
+                    </a>
                 </div>
             </nav>
         </aside>
