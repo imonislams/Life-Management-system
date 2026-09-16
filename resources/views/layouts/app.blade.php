@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ $title ?? 'Personal Finance Management System' }}</title>
+    <title>{{ $title ?? 'Personal Life Management System' }}</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body>
@@ -68,6 +68,36 @@
                         </a>
                     </div>
                 </div>
+
+                <!-- Daily Management Collapsible Accordion Parent -->
+                @php
+                    $isDailyManagementActive = request()->routeIs([
+                        'tasks.*',
+                        'habits.*',
+                        'routine.*'
+                    ]);
+                @endphp
+
+                <div class="nav-section accordion-section {{ $isDailyManagementActive ? 'expanded' : '' }}" id="dailyManagementSection">
+                    <button type="button" class="nav-accordion-toggle {{ $isDailyManagementActive ? 'active' : '' }}" id="dailyManagementToggle" aria-expanded="{{ $isDailyManagementActive ? 'true' : 'false' }}">
+                        <span class="nav-accordion-label">
+                            <span class="nav-icon">📅</span> Daily Management
+                        </span>
+                        <span class="accordion-chevron">▼</span>
+                    </button>
+
+                    <div class="nav-submenu" id="dailyManagementSubmenu">
+                        <a href="{{ route('tasks.index') }}" class="submenu-link {{ request()->routeIs('tasks.*') ? 'active' : '' }}">
+                            <span class="nav-icon">✅</span> Tasks
+                        </a>
+                        <a href="{{ route('habits.index') }}" class="submenu-link {{ request()->routeIs('habits.*') ? 'active' : '' }}">
+                            <span class="nav-icon">⚡</span> Habits
+                        </a>
+                        <a href="{{ route('routine.index') }}" class="submenu-link {{ request()->routeIs('routine.*') ? 'active' : '' }}">
+                            <span class="nav-icon">⏰</span> Daily Routine
+                        </a>
+                    </div>
+                </div>
             </nav>
         </aside>
 
@@ -119,17 +149,18 @@
                 });
             }
 
-            // Accordion Toggle Logic
-            const moneyToggle = document.getElementById('moneyManagementToggle');
-            const moneySection = document.getElementById('moneyManagementSection');
-
-            if (moneyToggle && moneySection) {
-                moneyToggle.addEventListener('click', function (e) {
+            // Accordion Toggle Logic for all accordion buttons
+            const accordionToggles = document.querySelectorAll('.nav-accordion-toggle');
+            accordionToggles.forEach(function (toggle) {
+                toggle.addEventListener('click', function (e) {
                     e.preventDefault();
-                    const isExpanded = moneySection.classList.toggle('expanded');
-                    moneyToggle.setAttribute('aria-expanded', isExpanded ? 'true' : 'false');
+                    const section = toggle.closest('.accordion-section');
+                    if (section) {
+                        const isExpanded = section.classList.toggle('expanded');
+                        toggle.setAttribute('aria-expanded', isExpanded ? 'true' : 'false');
+                    }
                 });
-            }
+            });
         });
     </script>
 </body>

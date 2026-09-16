@@ -53,4 +53,17 @@ Route::middleware('auth')->group(function () {
 
     // Recurring Transactions resource routes
     Route::resource('recurring-transactions', RecurringTransactionController::class)->except(['show']);
+
+    // Daily Management Routes (Phase 1 Placeholders)
+    Route::get('/daily-management/tasks', function () {
+        return view('daily-management.tasks');
+    })->name('tasks.index');
+
+    Route::get('/daily-management/habits', function () {
+        return view('daily-management.habits');
+    })->name('habits.index');
+
+    Route::get('/daily-management/routine', function () {
+        return view('daily-management.routine');
+    })->name('routine.index');
 });
