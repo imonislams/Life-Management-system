@@ -34,9 +34,8 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // Salary routes
-    Route::get('/salary', [SalaryController::class, 'index'])->name('salary.index');
-    Route::post('/salary', [SalaryController::class, 'update'])->name('salary.update');
+    // Salary resource routes
+    Route::resource('salary', SalaryController::class)->except(['show']);
 
     // Savings routes
     Route::get('/savings', [SavingsController::class, 'index'])->name('savings.index');
