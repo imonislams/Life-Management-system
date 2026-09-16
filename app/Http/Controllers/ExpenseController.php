@@ -15,13 +15,18 @@ class ExpenseController extends Controller
     {
         $query = $request->user()->expenseRecords();
 
-        // Filter by day-to-day date range (from_date ... to_date)
-        if ($request->filled('from_date')) {
-            $query->whereDate('date', '>=', $request->input('from_date'));
+        // Filter by specific date
+        if ($request->filled('date')) {
+            $query->whereDate('date', $request->input('date'));
         }
 
-        if ($request->filled('to_date')) {
-            $query->whereDate('date', '<=', $request->input('to_date'));
+        // Filter by month (YYYY-MM)
+        if ($request->filled('month')) {
+            $monthParts = explode('-', $request->input('month'));
+            if (count($monthParts) === 2) {
+                $query->whereYear('date', $monthParts[0])
+                      ->whereMonth('date', $monthParts[1]);
+            }
         }
 
         $expenseRecords = $query->orderBy('date', 'desc')

@@ -12,32 +12,32 @@
     <div class="dashboard-grid-5">
         <div class="summary-card">
             <div class="summary-card-title">Monthly Salary</div>
-            <div class="summary-card-value">{{ currency($monthlySalary) }}</div>
+            <div class="summary-card-value">৳ {{ number_format($monthlySalary, 2) }} TK</div>
         </div>
 
         <div class="summary-card">
             <div class="summary-card-title">Additional Income</div>
-            <div class="summary-card-value income-color">{{ currency($additionalIncome) }}</div>
+            <div class="summary-card-value income-color">৳ {{ number_format($additionalIncome, 2) }} TK</div>
         </div>
 
         <div class="summary-card">
             <div class="summary-card-title">Total Income</div>
-            <div class="summary-card-value income-color">{{ currency($totalIncome) }}</div>
+            <div class="summary-card-value income-color">৳ {{ number_format($totalIncome, 2) }} TK</div>
         </div>
 
         <div class="summary-card">
             <div class="summary-card-title">Total Expenses</div>
-            <div class="summary-card-value expense-color">{{ currency($totalExpenses) }}</div>
+            <div class="summary-card-value expense-color">৳ {{ number_format($totalExpenses, 2) }} TK</div>
         </div>
 
         <div class="summary-card">
             <div class="summary-card-title">Total Savings</div>
-            <div class="summary-card-value" style="color: #2563eb;">{{ currency($totalSavings) }}</div>
+            <div class="summary-card-value" style="color: #2563eb;">৳ {{ number_format($totalSavings, 2) }} TK</div>
         </div>
 
         <div class="summary-card">
             <div class="summary-card-title">Available Balance</div>
-            <div class="summary-card-value balance-color">{{ currency($availableBalance) }}</div>
+            <div class="summary-card-value balance-color">৳ {{ number_format($availableBalance, 2) }} TK</div>
         </div>
     </div>
 
@@ -47,7 +47,7 @@
             <div class="card-header-flex" style="margin-bottom: 0.5rem;">
                 <div>
                     <h2 class="card-title">Savings Goal: {{ $savingsSummary['name'] }}</h2>
-                    <p class="card-subtitle">Target: {{ currency($savingsSummary['target_amount']) }}</p>
+                    <p class="card-subtitle">Target: ৳ {{ number_format($savingsSummary['target_amount'], 2) }} TK</p>
                 </div>
                 <a href="{{ route('savings.index') }}" class="btn-secondary btn-sm">Manage Savings</a>
             </div>
@@ -56,14 +56,14 @@
                 <div style="flex: 1; min-width: 200px;">
                     <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem; font-size: 0.875rem; font-weight: 600;">
                         <span>Progress: {{ $savingsSummary['progress_percentage'] }}%</span>
-                        <span>Saved: {{ currency($savingsSummary['current_amount']) }}</span>
+                        <span>Saved: ৳ {{ number_format($savingsSummary['current_amount'], 2) }} TK</span>
                     </div>
                     <div style="background-color: #e2e8f0; border-radius: 0.375rem; height: 10px; overflow: hidden;">
                         <div style="width: {{ $savingsSummary['progress_percentage'] }}%; background-color: var(--primary-color); height: 100%;"></div>
                     </div>
                 </div>
                 <div style="font-size: 0.875rem; color: var(--text-muted); font-weight: 500;">
-                    Remaining: {{ currency($savingsSummary['remaining_amount']) }}
+                    Remaining: ৳ {{ number_format($savingsSummary['remaining_amount'], 2) }} TK
                 </div>
             </div>
         </div>
@@ -102,7 +102,7 @@
                                     @endif
                                 </td>
                                 <td class="{{ $item->type === 'income' ? 'text-amount-income' : 'text-amount-expense' }}">
-                                    {{ currency($item->amount) }}
+                                    ৳ {{ number_format($item->amount, 2) }} TK
                                 </td>
                                 <td>{{ \Carbon\Carbon::parse($item->next_due_date)->format('M d, Y') }}</td>
                             </tr>
@@ -155,7 +155,7 @@
                             @foreach ($recentIncome as $inc)
                                 <tr>
                                     <td>{{ \Carbon\Carbon::parse($inc->date)->format('M d, Y') }}</td>
-                                    <td class="text-amount-income">{{ currency($inc->amount) }}</td>
+                                    <td class="text-amount-income">৳ {{ number_format($inc->amount, 2) }} TK</td>
                                     <td>{{ $inc->description ?? '-' }}</td>
                                 </tr>
                             @endforeach
@@ -190,7 +190,7 @@
                             @foreach ($recentExpenses as $exp)
                                 <tr>
                                     <td>{{ \Carbon\Carbon::parse($exp->date)->format('M d, Y') }}</td>
-                                    <td class="text-amount-expense">{{ currency($exp->amount) }}</td>
+                                    <td class="text-amount-expense">৳ {{ number_format($exp->amount, 2) }} TK</td>
                                     <td>{{ $exp->description ?? '-' }}</td>
                                 </tr>
                             @endforeach
@@ -217,13 +217,13 @@
                         labels: @json($monthlyChartLabels),
                         datasets: [
                             {
-                                label: 'Total Income ({{ currency_label() }})',
+                                label: 'Total Income (TK)',
                                 data: @json($monthlyIncomeData),
                                 backgroundColor: '#22c55e',
                                 borderRadius: 4
                             },
                             {
-                                label: 'Total Expenses ({{ currency_label() }})',
+                                label: 'Total Expenses (TK)',
                                 data: @json($monthlyExpenseData),
                                 backgroundColor: '#ef4444',
                                 borderRadius: 4

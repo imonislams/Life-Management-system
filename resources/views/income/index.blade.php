@@ -22,24 +22,24 @@
         <!-- Filter Form -->
         <form method="GET" action="{{ route('income.index') }}" class="filter-bar">
             <div class="filter-group">
-                <label for="from_date" class="filter-label">From Date</label>
+                <label for="month" class="filter-label">Filter by Month</label>
                 <input
-                    type="date"
-                    id="from_date"
-                    name="from_date"
-                    value="{{ request('from_date') }}"
+                    type="month"
+                    id="month"
+                    name="month"
+                    value="{{ request('month') }}"
                     class="form-control"
                     style="width: 170px;"
                 >
             </div>
 
             <div class="filter-group">
-                <label for="to_date" class="filter-label">To Date</label>
+                <label for="date" class="filter-label">Filter by Date</label>
                 <input
                     type="date"
-                    id="to_date"
-                    name="to_date"
-                    value="{{ request('to_date') }}"
+                    id="date"
+                    name="date"
+                    value="{{ request('date') }}"
                     class="form-control"
                     style="width: 170px;"
                 >
@@ -47,7 +47,7 @@
 
             <div class="filter-group" style="flex-direction: row; gap: 0.5rem; align-items: flex-end;">
                 <button type="submit" class="btn-primary" style="padding: 0.625rem 0.875rem;">Filter</button>
-                @if(request('from_date') || request('to_date'))
+                @if(request('month') || request('date'))
                     <a href="{{ route('income.index') }}" class="btn-secondary btn-sm" style="padding: 0.625rem 0.875rem;">Clear</a>
                 @endif
             </div>
@@ -69,7 +69,7 @@
                         @foreach ($incomeRecords as $income)
                             <tr>
                                 <td>{{ \Carbon\Carbon::parse($income->date)->format('M d, Y') }}</td>
-                                <td class="text-amount-income">{{ currency($income->amount) }}</td>
+                                <td class="text-amount-income">৳ {{ number_format($income->amount, 2) }} TK</td>
                                 <td>{{ $income->description ?? '-' }}</td>
                                 <td style="text-align: right;">
                                     <div class="action-buttons" style="justify-content: flex-end;">

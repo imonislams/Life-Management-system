@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Salary;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -35,18 +34,6 @@ class SalaryController extends Controller
     }
 
     /**
-     * Keep the legacy user.salary column in sync with the sum of active salaries.
-     */
-    private function syncLegacySalary(User $user): void
-    {
-        $activeSum = $user->salaries()
-            ->where('is_active', true)
-            ->sum('amount');
-
-        $user->update(['salary' => $activeSum]);
-    }
-
-    /**
      * Store a newly created salary record.
      */
     public function store(Request $request)
@@ -63,14 +50,17 @@ class SalaryController extends Controller
             'payment_day.between' => 'The salary payment day must be between 1 and 31.',
         ]);
 
-        $validated['is_active'] = $request->boolean('is_active', true);
+        $validated['is_active'] = $request->has('is_active') ? $request->boolean('is_active') : true;
 
-        $request->user()->salaries()->create($validated);
+        $salary = $request->user()->salaries()->create($validated);
 
-        $this->syncLegacySalary($request->user());
+        // Keep legacy user.salary column in sync
+        $user = $request->user();
+        $activeSum = $user->salaries()->where('is_active', true)->sum('amount');
+        $user->salary = $activeSum;
+        $user->saveQuietly();
 
-        return redirect()->route('salary.index')
-            ->with('status', 'Salary record added successfully.');
+        return redirect()->route('salary.index')->with('status', 'Salary record added successfully.');
     }
 
     /**
@@ -108,18 +98,17 @@ class SalaryController extends Controller
             'payment_day.between' => 'The salary payment day must be between 1 and 31.',
         ]);
 
-        // Preserve the existing status when the checkbox is not submitted,
-        // so editing other fields never silently deactivates the record.
-        $validated['is_active'] = $request->has('is_active')
-            ? $request->boolean('is_active')
-            : $salary->is_active;
+        $validated['is_active'] = $request->has('is_active') ? $request->boolean('is_active') : false;
 
         $salary->update($validated);
 
-        $this->syncLegacySalary($request->user());
+        // Keep legacy user.salary column in sync
+        $user = $request->user();
+        $activeSum = $user->salaries()->where('is_active', true)->sum('amount');
+        $user->salary = $activeSum;
+        $user->saveQuietly();
 
-        return redirect()->route('salary.index')
-            ->with('status', 'Salary record updated successfully.');
+        return redirect()->route('salary.index')->with('status', 'Salary record updated successfully.');
     }
 
     /**
@@ -132,12 +121,13 @@ class SalaryController extends Controller
         }
 
         $user = $salary->user;
-
         $salary->delete();
 
-        $this->syncLegacySalary($user);
+        // Keep legacy user.salary column in sync
+        $activeSum = $user->salaries()->where('is_active', true)->sum('amount');
+        $user->salary = $activeSum;
+        $user->saveQuietly();
 
-        return redirect()->route('salary.index')
-            ->with('status', 'Salary record deleted successfully.');
+        return redirect()->route('salary.index')->with('status', 'Salary record deleted successfully.');
     }
 }

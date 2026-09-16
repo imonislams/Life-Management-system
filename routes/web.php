@@ -44,9 +44,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/savings', [SavingsController::class, 'index'])->name('savings.index');
     Route::post('/savings', [SavingsController::class, 'storeOrUpdate'])->name('savings.store');
     Route::post('/savings/add-money', [SavingsController::class, 'addMoney'])->name('savings.add-money');
-    Route::delete('/savings', [SavingsController::class, 'destroy'])->name('savings.destroy');
-    Route::post('/savings/records', [SavingsController::class, 'storeRecord'])->name('savings.records.store');
-    Route::delete('/savings/records/{savingsRecord}', [SavingsController::class, 'destroyRecord'])->name('savings.records.destroy');
 
     // Income resource routes
     Route::resource('income', IncomeController::class)->except(['show']);
@@ -57,10 +54,9 @@ Route::middleware('auth')->group(function () {
     // Recurring Transactions resource routes
     Route::resource('recurring-transactions', RecurringTransactionController::class)->except(['show']);
 
-    // Daily Management Routes (Phase 1 Placeholders)
-    Route::get('/daily-management/tasks', function () {
-        return view('daily-management.tasks');
-    })->name('tasks.index');
+    // Daily Management Routes
+    Route::patch('/daily-management/tasks/{task}/toggle', [\App\Http\Controllers\TaskController::class, 'toggleStatus'])->name('tasks.toggle');
+    Route::resource('/daily-management/tasks', \App\Http\Controllers\TaskController::class)->except(['show'])->names('tasks');
 
     Route::get('/daily-management/habits', function () {
         return view('daily-management.habits');
