@@ -34,6 +34,9 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
+    // Money Management Overview
+    Route::get('/money-management', [\App\Http\Controllers\MoneyManagementController::class, 'index'])->name('money-management.index');
+
     // Salary resource routes
     Route::resource('salary', SalaryController::class)->except(['show']);
 
