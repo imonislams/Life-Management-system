@@ -27,24 +27,46 @@
                     </a>
                 </div>
 
-                <!-- Money Management -->
-                <div class="nav-section">
-                    <div class="nav-section-title">Money Management</div>
-                    <a href="{{ route('income.index') }}" class="nav-link {{ request()->routeIs('income.*') ? 'active' : '' }}">
-                        <span class="nav-icon">📈</span> Income
-                    </a>
-                    <a href="{{ route('expenses.index') }}" class="nav-link {{ request()->routeIs('expenses.*') ? 'active' : '' }}">
-                        <span class="nav-icon">📉</span> Expense
-                    </a>
-                    <a href="{{ route('salary.index') }}" class="nav-link {{ request()->routeIs('salary.*') ? 'active' : '' }}">
-                        <span class="nav-icon">💵</span> Salary
-                    </a>
-                    <a href="{{ route('savings.index') }}" class="nav-link {{ request()->routeIs('savings.*') ? 'active' : '' }}">
-                        <span class="nav-icon">🏦</span> Savings
-                    </a>
-                    <a href="{{ route('recurring-transactions.index') }}" class="nav-link {{ request()->routeIs('recurring-transactions.*') ? 'active' : '' }}">
-                        <span class="nav-icon">🔄</span> Recurring Finance
-                    </a>
+                <!-- Money Management Collapsible Accordion Parent -->
+                @php
+                    $isMoneyManagementActive = request()->routeIs([
+                        'money-management.*',
+                        'income.*',
+                        'salary.*',
+                        'expenses.*',
+                        'savings.*',
+                        'recurring-transactions.*'
+                    ]);
+                @endphp
+
+                <div class="nav-section accordion-section {{ $isMoneyManagementActive ? 'expanded' : '' }}" id="moneyManagementSection">
+                    <button type="button" class="nav-accordion-toggle {{ $isMoneyManagementActive ? 'active' : '' }}" id="moneyManagementToggle" aria-expanded="{{ $isMoneyManagementActive ? 'true' : 'false' }}">
+                        <span class="nav-accordion-label">
+                            <span class="nav-icon">💼</span> Money Management
+                        </span>
+                        <span class="accordion-chevron">▼</span>
+                    </button>
+
+                    <div class="nav-submenu" id="moneyManagementSubmenu">
+                        <a href="{{ route('money-management.index') }}" class="submenu-link {{ request()->routeIs('money-management.*') ? 'active' : '' }}">
+                            <span class="nav-icon">📊</span> Dashboard
+                        </a>
+                        <a href="{{ route('income.index') }}" class="submenu-link {{ request()->routeIs('income.*') ? 'active' : '' }}">
+                            <span class="nav-icon">📈</span> Income
+                        </a>
+                        <a href="{{ route('salary.index') }}" class="submenu-link {{ request()->routeIs('salary.*') ? 'active' : '' }}">
+                            <span class="nav-icon">💵</span> Salary
+                        </a>
+                        <a href="{{ route('expenses.index') }}" class="submenu-link {{ request()->routeIs('expenses.*') ? 'active' : '' }}">
+                            <span class="nav-icon">📉</span> Expense
+                        </a>
+                        <a href="{{ route('savings.index') }}" class="submenu-link {{ request()->routeIs('savings.*') ? 'active' : '' }}">
+                            <span class="nav-icon">🏦</span> Savings
+                        </a>
+                        <a href="{{ route('recurring-transactions.index') }}" class="submenu-link {{ request()->routeIs('recurring-transactions.*') ? 'active' : '' }}">
+                            <span class="nav-icon">🔄</span> Recurring Finance
+                        </a>
+                    </div>
                 </div>
             </nav>
         </aside>
@@ -77,9 +99,10 @@
         </div>
     </div>
 
-    <!-- Vanilla JavaScript for Mobile Sidebar Toggle -->
+    <!-- JavaScript for Mobile Sidebar Toggle & Accordion Navigation -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            // Mobile Sidebar Toggle
             const sidebar = document.getElementById('sidebar');
             const toggleBtn = document.getElementById('sidebarToggle');
             const backdrop = document.getElementById('sidebarBackdrop');
@@ -93,6 +116,18 @@
                 backdrop.addEventListener('click', function () {
                     sidebar.classList.remove('open');
                     backdrop.classList.remove('open');
+                });
+            }
+
+            // Accordion Toggle Logic
+            const moneyToggle = document.getElementById('moneyManagementToggle');
+            const moneySection = document.getElementById('moneyManagementSection');
+
+            if (moneyToggle && moneySection) {
+                moneyToggle.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const isExpanded = moneySection.classList.toggle('expanded');
+                    moneyToggle.setAttribute('aria-expanded', isExpanded ? 'true' : 'false');
                 });
             }
         });
