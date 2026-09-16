@@ -24,22 +24,18 @@ class MoneyManagementController extends Controller
                 $startDate = $now->copy()->subMonth()->startOfMonth();
                 $endDate = $now->copy()->subMonth()->endOfMonth();
                 break;
-
             case 'last_3_months':
                 $startDate = $now->copy()->subMonths(2)->startOfMonth();
                 $endDate = $now->copy()->endOfMonth();
                 break;
-
             case 'this_year':
                 $startDate = $now->copy()->startOfYear();
                 $endDate = $now->copy()->endOfYear();
                 break;
-
             case 'all_time':
                 $startDate = null;
                 $endDate = null;
                 break;
-
             case 'this_month':
             default:
                 $period = 'this_month';
@@ -49,34 +45,20 @@ class MoneyManagementController extends Controller
         }
 
         // 2. Salary Analytics
-        $activeSalaryRecord = $user->salaries()
-            ->where('is_active', true)
-            ->orderBy('id', 'desc')
-            ->first();
+        $activeSalaryRecord = $user->salaries()->where('is_active', true)->orderBy('id', 'desc')->first();
+        $activeSalariesSum = (float) $user->salaries()->where('is_active', true)->sum('amount');
+        $monthlySalary = $activeSalariesSum > 0 ? $activeSalariesSum : (float) ($user->salary ?? 0);
 
-        $activeSalariesSum = (float) $user->salaries()
-            ->where('is_active', true)
-            ->sum('amount');
-
-        $monthlySalary = $activeSalariesSum > 0
-            ? $activeSalariesSum
-            : (float) ($user->salary ?? 0);
-
-        // 3. Additional Income
+        // 3. Additional Income (Filtered by Period)
         $incomeQuery = $user->incomeRecords();
-
         if ($startDate && $endDate) {
-            $incomeQuery->whereBetween('date', [
-                $startDate->toDateString(),
-                $endDate->toDateString(),
-            ]);
+            $incomeQuery->whereBetween('date', [$startDate->toDateString(), $endDate->toDateString()]);
         }
-
         $additionalIncome = (float) $incomeQuery->sum('amount');
 
-        // Total Income
+        // Total Income in selected period
+        // For monthly/yearly calculations, scale or include active salary
         $monthsInPeriod = 1;
-
         if ($period === 'last_3_months') {
             $monthsInPeriod = 3;
         } elseif ($period === 'this_year') {
@@ -84,20 +66,14 @@ class MoneyManagementController extends Controller
         } elseif ($period === 'all_time') {
             $monthsInPeriod = 1;
         }
-
         $periodSalaryTotal = $monthlySalary * $monthsInPeriod;
         $totalIncome = $periodSalaryTotal + $additionalIncome;
 
         // 4. Expense Analytics
         $expenseQuery = $user->expenseRecords();
-
         if ($startDate && $endDate) {
-            $expenseQuery->whereBetween('date', [
-                $startDate->toDateString(),
-                $endDate->toDateString(),
-            ]);
+            $expenseQuery->whereBetween('date', [$startDate->toDateString(), $endDate->toDateString()]);
         }
-
         $totalExpenses = (float) $expenseQuery->sum('amount');
 
         // Current Month vs Previous Month Expense
@@ -107,19 +83,14 @@ class MoneyManagementController extends Controller
             ->sum('amount');
 
         $lastMonthDate = $now->copy()->subMonth();
-
         $prevMonthExpenses = (float) $user->expenseRecords()
             ->whereYear('date', $lastMonthDate->year)
             ->whereMonth('date', $lastMonthDate->month)
             ->sum('amount');
 
         $expenseGrowthPercent = 0;
-
         if ($prevMonthExpenses > 0) {
-            $expenseGrowthPercent = round(
-                (($currentMonthExpenses - $prevMonthExpenses) / $prevMonthExpenses) * 100,
-                1
-            );
+            $expenseGrowthPercent = round((($currentMonthExpenses - $prevMonthExpenses) / $prevMonthExpenses) * 100, 1);
         }
 
         $highestExpenseRecord = $user->expenseRecords()
@@ -128,36 +99,17 @@ class MoneyManagementController extends Controller
 
         // 5. Savings Analytics
         $savingsGoal = $user->savingsGoal;
+        $targetSavings = $savingsGoal ? (float) $savingsGoal->target_amount : 0.0;
+        $currentSavings = $savingsGoal ? (float) $savingsGoal->current_amount : 0.0;
+        $savingsPercentage = $totalIncome > 0 ? min(100, round(($currentSavings / $totalIncome) * 100, 1)) : 0;
 
-        $targetSavings = $savingsGoal
-            ? (float) $savingsGoal->target_amount
-            : 0.0;
-
-        $currentSavings = $savingsGoal
-            ? (float) $savingsGoal->current_amount
-            : 0.0;
-
-        $savingsPercentage = $totalIncome > 0
-            ? min(100, round(($currentSavings / $totalIncome) * 100, 1))
-            : 0;
-
-        // 6. Available Balance
+        // 6. Available Balance (Total Income - Total Expense - Total Savings)
         $availableBalance = $totalIncome - $totalExpenses - $currentSavings;
 
         // 7. Recurring Finance Overview
-        $activeRecurringCount = $user->recurringTransactions()
-            ->where('is_active', true)
-            ->count();
-
-        $recurringIncomeCount = $user->recurringTransactions()
-            ->where('is_active', true)
-            ->where('type', 'income')
-            ->count();
-
-        $recurringExpenseCount = $user->recurringTransactions()
-            ->where('is_active', true)
-            ->where('type', 'expense')
-            ->count();
+        $activeRecurringCount = $user->recurringTransactions()->where('is_active', true)->count();
+        $recurringIncomeCount = $user->recurringTransactions()->where('is_active', true)->where('type', 'income')->count();
+        $recurringExpenseCount = $user->recurringTransactions()->where('is_active', true)->where('type', 'expense')->count();
 
         $recurringIncomeTotal = (float) $user->recurringTransactions()
             ->where('is_active', true)
@@ -171,43 +123,40 @@ class MoneyManagementController extends Controller
 
         $netRecurringAmount = $recurringIncomeTotal - $recurringExpenseTotal;
 
-        // 8. Monthly Income vs Expense Chart
+        // 8. Monthly Income vs Expense Chart (Last 6 Months)
         $monthlyChart = [];
-
         for ($i = 5; $i >= 0; $i--) {
-            $monthDate = $now->copy()->subMonths($i);
+            $mDate = $now->copy()->subMonths($i);
+            $year = $mDate->year;
+            $month = $mDate->month;
 
             $mAddIncome = (float) $user->incomeRecords()
-                ->whereYear('date', $monthDate->year)
-                ->whereMonth('date', $monthDate->month)
+                ->whereYear('date', $year)
+                ->whereMonth('date', $month)
                 ->sum('amount');
 
             $mIncome = $monthlySalary + $mAddIncome;
 
             $mExpense = (float) $user->expenseRecords()
-                ->whereYear('date', $monthDate->year)
-                ->whereMonth('date', $monthDate->month)
+                ->whereYear('date', $year)
+                ->whereMonth('date', $month)
                 ->sum('amount');
 
             $monthlyChart[] = [
-                'label' => $monthDate->format('M Y'),
+                'label' => $mDate->format('M Y'),
                 'income' => $mIncome,
                 'expense' => $mExpense,
                 'net' => $mIncome - $mExpense,
             ];
         }
 
+        // Find max value in monthly chart for bar height calculation
         $maxChartVal = 1;
-
-        foreach ($monthlyChart as $chartItem) {
-            $maxChartVal = max(
-                $maxChartVal,
-                $chartItem['income'],
-                $chartItem['expense']
-            );
+        foreach ($monthlyChart as $mc) {
+            $maxChartVal = max($maxChartVal, $mc['income'], $mc['expense']);
         }
 
-        // 9. Recent Income Transactions
+        // 9. Recent Merged Activity Transactions
         $recentIncomes = $user->incomeRecords()
             ->orderBy('date', 'desc')
             ->orderBy('id', 'desc')
@@ -216,18 +165,13 @@ class MoneyManagementController extends Controller
             ->map(function ($item) {
                 return [
                     'type' => 'income',
-                    'title' => !empty($item->description)
-                        ? $item->description
-                        : 'Income',
+                    'title' => !empty($item->description) ? $item->description : 'Income',
                     'amount' => (float) $item->amount,
                     'date' => $item->date,
-                    'description' => !empty($item->description)
-                        ? $item->description
-                        : 'Income record',
+                    'description' => !empty($item->description) ? $item->description : 'Income record',
                 ];
             });
 
-        // 10. Recent Expense Transactions
         $recentExpenses = $user->expenseRecords()
             ->orderBy('date', 'desc')
             ->orderBy('id', 'desc')
@@ -236,20 +180,14 @@ class MoneyManagementController extends Controller
             ->map(function ($item) {
                 return [
                     'type' => 'expense',
-                    'title' => !empty($item->description)
-                        ? $item->description
-                        : 'Expense',
+                    'title' => !empty($item->description) ? $item->description : 'Expense',
                     'amount' => (float) $item->amount,
                     'date' => $item->date,
-                    'description' => !empty($item->description)
-                        ? $item->description
-                        : 'Expense record',
+                    'description' => !empty($item->description) ? $item->description : 'Expense record',
                 ];
             });
 
-        // 11. Recent Merged Activity
-        $recentTransactions = $recentIncomes
-            ->concat($recentExpenses)
+        $recentTransactions = $recentIncomes->concat($recentExpenses)
             ->sortByDesc('date')
             ->take(8)
             ->values();

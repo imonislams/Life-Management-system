@@ -38,7 +38,7 @@
             </div>
 
             <div class="form-group">
-                <label for="amount" class="form-label">Amount ({{ currency_label() }}) <span style="color: var(--danger-color);">*</span></label>
+                <label for="amount" class="form-label">Amount (TK) <span style="color: var(--danger-color);">*</span></label>
                 <input
                     id="amount"
                     type="number"

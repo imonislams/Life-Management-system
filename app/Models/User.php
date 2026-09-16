@@ -66,11 +66,6 @@ class User extends Authenticatable
         return $this->hasOne(SavingsGoal::class);
     }
 
-    public function savingsRecords(): HasMany
-    {
-        return $this->hasMany(SavingsRecord::class);
-    }
-
     public function recurringTransactions(): HasMany
     {
         return $this->hasMany(RecurringTransaction::class);
@@ -79,5 +74,10 @@ class User extends Authenticatable
     public function salaries(): HasMany
     {
         return $this->hasMany(Salary::class);
+    }
+
+    public function tasks(): HasMany
+    {
+        return $this->hasMany(Task::class);
     }
 }
