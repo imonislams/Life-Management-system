@@ -54,9 +54,11 @@ class SalaryController extends Controller
 
         $salary = $request->user()->salaries()->create($validated);
 
-        // Keep legacy user.salary column in sync with active salary sum
-        $activeSum = $request->user()->salaries()->where('is_active', true)->sum('amount');
-        $request->user()->update(['salary' => $activeSum]);
+        // Keep legacy user.salary column in sync
+        $user = $request->user();
+        $activeSum = $user->salaries()->where('is_active', true)->sum('amount');
+        $user->salary = $activeSum;
+        $user->saveQuietly();
 
         return redirect()->route('salary.index')->with('status', 'Salary record added successfully.');
     }
@@ -100,9 +102,11 @@ class SalaryController extends Controller
 
         $salary->update($validated);
 
-        // Keep legacy user.salary column in sync with active salary sum
-        $activeSum = $request->user()->salaries()->where('is_active', true)->sum('amount');
-        $request->user()->update(['salary' => $activeSum]);
+        // Keep legacy user.salary column in sync
+        $user = $request->user();
+        $activeSum = $user->salaries()->where('is_active', true)->sum('amount');
+        $user->salary = $activeSum;
+        $user->saveQuietly();
 
         return redirect()->route('salary.index')->with('status', 'Salary record updated successfully.');
     }
@@ -119,9 +123,10 @@ class SalaryController extends Controller
         $user = $salary->user;
         $salary->delete();
 
-        // Keep legacy user.salary column in sync with active salary sum
+        // Keep legacy user.salary column in sync
         $activeSum = $user->salaries()->where('is_active', true)->sum('amount');
-        $user->update(['salary' => $activeSum]);
+        $user->salary = $activeSum;
+        $user->saveQuietly();
 
         return redirect()->route('salary.index')->with('status', 'Salary record deleted successfully.');
     }

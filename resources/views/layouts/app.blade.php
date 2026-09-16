@@ -49,7 +49,7 @@
 
                     <div class="nav-submenu" id="moneyManagementSubmenu">
                         <a href="{{ route('money-management.index') }}" class="submenu-link {{ request()->routeIs('money-management.*') ? 'active' : '' }}">
-                            <span class="nav-icon">📊</span> Dashboard
+                            <span class="nav-icon">📊</span> Analytics Dashboard
                         </a>
                         <a href="{{ route('income.index') }}" class="submenu-link {{ request()->routeIs('income.*') ? 'active' : '' }}">
                             <span class="nav-icon">📈</span> Income
