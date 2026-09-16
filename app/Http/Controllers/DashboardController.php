@@ -19,7 +19,8 @@ class DashboardController extends Controller
         $currentMonth = $now->month;
 
         // 1. Current Month Financial Summary
-        $monthlySalary = (float) ($user->salary ?? 0);
+        $activeSalariesSum = (float) $user->salaries()->where('is_active', true)->sum('amount');
+        $monthlySalary = $activeSalariesSum > 0 ? $activeSalariesSum : (float) ($user->salary ?? 0);
 
         $additionalIncome = (float) $user->incomeRecords()
             ->whereYear('date', $currentYear)
