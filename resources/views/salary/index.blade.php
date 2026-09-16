@@ -24,7 +24,7 @@
             <div class="summary-card">
                 <div class="summary-card-title">Monthly Salary</div>
                 <div class="summary-card-value balance-color">
-                    ৳ {{ number_format($totalActiveSalary, 2) }} TK
+                    {{ currency($totalActiveSalary) }}
                 </div>
             </div>
 
@@ -32,7 +32,7 @@
                 <div class="summary-card-title">Payment Day</div>
                 <div class="summary-card-value" style="font-size: 1.125rem;">
                     @if ($activeSalaryRecord && $activeSalaryRecord->payment_day)
-                        Every month on the {{ $activeSalaryRecord->payment_day }}{{ ordinal_suffix($activeSalaryRecord->payment_day) }}
+                        Every month on the {{ $activeSalaryRecord->payment_day }}{{ ordinal_suffix((int) $activeSalaryRecord->payment_day) }}
                     @else
                         Not Set
                     @endif
@@ -72,7 +72,7 @@
                     <tbody>
                         @foreach ($salaries as $record)
                             <tr>
-                                <td class="text-amount-income">৳ {{ number_format($record->amount, 2) }} TK</td>
+                                <td class="text-amount-income">{{ currency($record->amount) }}</td>
                                 <td>
                                     @if ($record->payment_day)
                                         Day {{ $record->payment_day }} of month
@@ -112,16 +112,3 @@
         @endif
     </div>
 </x-app-layout>
-
-@php
-function ordinal_suffix($num) {
-    if (!in_array(($num % 100), array(11, 12, 13))) {
-        switch ($num % 10) {
-            case 1: return 'st';
-            case 2: return 'nd';
-            case 3: return 'rd';
-        }
-    }
-    return 'th';
-}
-@endphp

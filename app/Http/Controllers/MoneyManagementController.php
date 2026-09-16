@@ -57,6 +57,60 @@ class MoneyManagementController extends Controller
             ->where('type', 'expense')
             ->sum('amount');
 
+        // 8. Monthly Recurring Amount (net recurring impact per month)
+        $recurringMonthlyAmount = $recurringIncomeTotal - $recurringExpenseTotal;
+
+        // 9. Savings Overview
+        $savingsTarget = $savingsGoal ? (float) $savingsGoal->target_amount : 0.0;
+        $savingsRemaining = $savingsGoal ? max(0, $savingsTarget - $currentSavings) : 0.0;
+        $savingsProgress = ($savingsGoal && $savingsTarget > 0)
+            ? min(100, round(($currentSavings / $savingsTarget) * 100, 2))
+            : 0;
+
+        // 10. Salary Overview
+        $activeSalaryRecord = $user->salaries()
+            ->where('is_active', true)
+            ->orderBy('id', 'desc')
+            ->first();
+        $activeSalaryCount = $user->salaries()->where('is_active', true)->count();
+
+        // 11. Monthly Income vs Expense Chart (Last 6 Months)
+        $monthlyChartLabels = [];
+        $monthlyIncomeData = [];
+        $monthlyExpenseData = [];
+
+        for ($i = 5; $i >= 0; $i--) {
+            $monthDate = Carbon::now()->subMonths($i);
+
+            $monthlyChartLabels[] = $monthDate->format('M Y');
+
+            $mAddIncome = (float) $user->incomeRecords()
+                ->whereYear('date', $monthDate->year)
+                ->whereMonth('date', $monthDate->month)
+                ->sum('amount');
+
+            $mExpenses = (float) $user->expenseRecords()
+                ->whereYear('date', $monthDate->year)
+                ->whereMonth('date', $monthDate->month)
+                ->sum('amount');
+
+            $monthlyIncomeData[] = $monthlySalary + $mAddIncome;
+            $monthlyExpenseData[] = $mExpenses;
+        }
+
+        // 12. Recent Transactions
+        $recentIncome = $user->incomeRecords()
+            ->orderBy('date', 'desc')
+            ->orderBy('id', 'desc')
+            ->take(5)
+            ->get();
+
+        $recentExpenses = $user->expenseRecords()
+            ->orderBy('date', 'desc')
+            ->orderBy('id', 'desc')
+            ->take(5)
+            ->get();
+
         return view('money-management.index', compact(
             'monthlySalary',
             'additionalIncome',
@@ -67,7 +121,18 @@ class MoneyManagementController extends Controller
             'currentBalance',
             'activeRecurringCount',
             'recurringIncomeTotal',
-            'recurringExpenseTotal'
+            'recurringExpenseTotal',
+            'recurringMonthlyAmount',
+            'savingsTarget',
+            'savingsRemaining',
+            'savingsProgress',
+            'activeSalaryRecord',
+            'activeSalaryCount',
+            'monthlyChartLabels',
+            'monthlyIncomeData',
+            'monthlyExpenseData',
+            'recentIncome',
+            'recentExpenses'
         ));
     }
 }
