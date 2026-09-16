@@ -1,19 +1,67 @@
 <x-app-layout>
-    <x-slot name="title">Money Management Dashboard - Personal Finance Management System</x-slot>
-    <x-slot name="pageTitle">Money Management Dashboard</x-slot>
+    <x-slot name="title">Money Analytics - Personal Finance Management System</x-slot>
+    <x-slot name="pageTitle">Money Analytics</x-slot>
 
     <!-- Header Panel -->
     <div class="card">
         <div class="card-header-flex">
             <div>
-                <h2 class="card-title">Money Management Dashboard</h2>
-                <p class="card-subtitle">Analytics overview of your complete financial portfolio</p>
+                <h2 class="card-title">Money Analytics</h2>
+                <p class="card-subtitle">
+                    Understand your income, expenses, savings, and financial balance at a glance.
+                </p>
             </div>
+
+            <form
+                method="GET"
+                action="{{ route('money-management.index') }}"
+                class="filter-group"
+                style="flex-direction: row; align-items: center; gap: 0.5rem;"
+            >
+                <label
+                    for="period"
+                    class="filter-label"
+                    style="margin: 0; white-space: nowrap;"
+                >
+                    Period:
+                </label>
+
+                <select
+                    name="period"
+                    id="period"
+                    class="form-control"
+                    style="width: auto; padding: 0.375rem 0.75rem;"
+                    onchange="this.form.submit()"
+                >
+                    <option value="this_month" {{ $period === 'this_month' ? 'selected' : '' }}>
+                        This Month
+                    </option>
+
+                    <option value="last_month" {{ $period === 'last_month' ? 'selected' : '' }}>
+                        Last Month
+                    </option>
+
+                    <option value="last_3_months" {{ $period === 'last_3_months' ? 'selected' : '' }}>
+                        Last 3 Months
+                    </option>
+
+                    <option value="this_year" {{ $period === 'this_year' ? 'selected' : '' }}>
+                        This Year
+                    </option>
+
+                    <option value="all_time" {{ $period === 'all_time' ? 'selected' : '' }}>
+                        All Time
+                    </option>
+                </select>
+            </form>
         </div>
     </div>
 
-    <!-- Summary Cards Grid -->
-    <div class="dashboard-grid-5">
+    <!-- Analytics Summary Cards -->
+    <div
+        class="dashboard-grid-5"
+        style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));"
+    >
         <!-- Total Income -->
         <div class="summary-card">
             <div class="summary-card-title">Total Income</div>
@@ -30,9 +78,9 @@
             </div>
         </div>
 
-        <!-- Total Expenses -->
+        <!-- Total Expense -->
         <div class="summary-card">
-            <div class="summary-card-title">Total Expenses</div>
+            <div class="summary-card-title">Total Expense</div>
             <div class="summary-card-value expense-color">
                 {{ currency($totalExpenses) }}
             </div>
@@ -50,119 +98,380 @@
         <div class="summary-card">
             <div class="summary-card-title">Available Balance</div>
             <div class="summary-card-value balance-color">
-                {{ currency($totalIncome - $totalExpenses - $currentSavings) }}
+                {{ currency($availableBalance) }}
             </div>
         </div>
 
-        <!-- Recurring Monthly Amount -->
+        <!-- Net Recurring -->
         <div class="summary-card">
-            <div class="summary-card-title">Recurring Monthly</div>
-            <div class="summary-card-value {{ $recurringMonthlyAmount < 0 ? 'expense-color' : 'income-color' }}">
-                {{ currency($recurringMonthlyAmount) }}
+            <div class="summary-card-title">Net Recurring</div>
+            <div
+                class="summary-card-value"
+                style="color: {{ $netRecurringAmount >= 0 ? '#16a34a' : '#dc2626' }};"
+            >
+                {{ currency($netRecurringAmount) }}
             </div>
         </div>
     </div>
 
-    <!-- Monthly Income vs Expense Chart -->
+    <!-- Income vs Expense Chart -->
     <div class="card">
-        <h2 class="card-title" style="margin-bottom: 1rem;">Monthly Income vs Expense</h2>
-        @if (array_sum($monthlyIncomeData) > 0 || array_sum($monthlyExpenseData) > 0)
-            <div class="chart-container">
-                <canvas id="moneyMonthlyChart"></canvas>
+        <div class="card-header-flex">
+            <div>
+                <h3 class="card-title">Income vs Expense Analytics</h3>
+                <p class="card-subtitle">
+                    Comparing total monthly income against total expenses for recent months
+                </p>
             </div>
-        @else
-            <div class="empty-state">
-                <div class="empty-state-title">No financial data available for chart</div>
-                <p>Add income or expense records to view the comparison.</p>
+
+            <div style="display: flex; gap: 1rem; font-size: 0.85rem;">
+                <span style="display: flex; align-items: center; gap: 0.35rem;">
+                    <span
+                        style="width: 12px; height: 12px; background: #16a34a; border-radius: 2px;"
+                    ></span>
+                    Income
+                </span>
+
+                <span style="display: flex; align-items: center; gap: 0.35rem;">
+                    <span
+                        style="width: 12px; height: 12px; background: #dc2626; border-radius: 2px;"
+                    ></span>
+                    Expense
+                </span>
             </div>
-        @endif
+        </div>
+
+        <div
+            style="
+                display: flex;
+                justify-content: space-around;
+                align-items: flex-end;
+                height: 200px;
+                padding-top: 1.5rem;
+                border-bottom: 1px solid #e2e8f0;
+                gap: 1rem;
+                overflow-x: auto;
+            "
+        >
+            @foreach($monthlyChart as $bar)
+                @php
+                    $incHeight = $maxChartVal > 0
+                        ? max(4, round(($bar['income'] / $maxChartVal) * 150))
+                        : 4;
+
+                    $expHeight = $maxChartVal > 0
+                        ? max(4, round(($bar['expense'] / $maxChartVal) * 150))
+                        : 4;
+                @endphp
+
+                <div
+                    style="
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        min-width: 60px;
+                        flex: 1;
+                    "
+                >
+                    <div
+                        style="
+                            display: flex;
+                            align-items: flex-end;
+                            gap: 6px;
+                            height: 160px;
+                        "
+                    >
+                        <!-- Income Bar -->
+                        <div
+                            title="Income: {{ currency($bar['income']) }}"
+                            style="
+                                width: 18px;
+                                height: {{ $incHeight }}px;
+                                background-color: #16a34a;
+                                border-radius: 3px 3px 0 0;
+                                transition: height 0.3s;
+                            "
+                        ></div>
+
+                        <!-- Expense Bar -->
+                        <div
+                            title="Expense: {{ currency($bar['expense']) }}"
+                            style="
+                                width: 18px;
+                                height: {{ $expHeight }}px;
+                                background-color: #dc2626;
+                                border-radius: 3px 3px 0 0;
+                                transition: height 0.3s;
+                            "
+                        ></div>
+                    </div>
+
+                    <span
+                        style="
+                            font-size: 0.75rem;
+                            color: #64748b;
+                            margin-top: 0.5rem;
+                            font-weight: 500;
+                        "
+                    >
+                        {{ $bar['label'] }}
+                    </span>
+                </div>
+            @endforeach
+        </div>
     </div>
 
-    <!-- Overview Grid: Savings / Salary / Recurring -->
-    <div class="dashboard-tx-grid" style="margin-bottom: 1.5rem;">
-        <!-- Savings Overview -->
-        <div class="card" style="margin-bottom: 0;">
-            <div class="card-header-flex">
-                <h3 class="card-title">Savings Overview</h3>
-                <a href="{{ route('savings.index') }}" class="btn-secondary btn-sm">Manage Savings</a>
-            </div>
+    <!-- Analytics Breakdown Grid -->
+    <div
+        class="dashboard-tx-grid"
+        style="
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            margin-bottom: 1.5rem;
+        "
+    >
+        <!-- Expense Analysis -->
+        <div class="card">
+            <h3 class="card-title" style="margin-bottom: 0.75rem;">
+                Expense Analysis
+            </h3>
 
-            @if ($savingsGoal)
-                <p class="card-subtitle" style="margin-bottom: 0.75rem;">{{ $savingsGoal->name }}</p>
-                <div style="display: flex; justify-content: space-between; margin-bottom: 0.375rem; font-size: 0.875rem; font-weight: 600;">
-                    <span>Progress: {{ $savingsProgress }}%</span>
-                    <span>Saved: {{ currency($currentSavings) }}</span>
-                </div>
-                <div style="background-color: #e2e8f0; border-radius: 0.375rem; height: 12px; overflow: hidden;">
-                    <div style="width: {{ $savingsProgress }}%; background-color: var(--primary-color); height: 100%;"></div>
-                </div>
-                <div style="display: flex; justify-content: space-between; margin-top: 0.75rem; font-size: 0.875rem; color: var(--text-muted);">
-                    <span>Target: <strong style="color: var(--text-main);">{{ currency($savingsTarget) }}</strong></span>
-                    <span>Remaining: <strong style="color: var(--text-main);">{{ currency($savingsRemaining) }}</strong></span>
-                </div>
-            @else
-                <div class="empty-state" style="padding: 1.5rem 1rem;">
-                    <div class="empty-state-title">No savings goal set.</div>
-                    <p>Create a savings goal to track your progress.</p>
-                </div>
-            @endif
-        </div>
-
-        <!-- Salary Overview -->
-        <div class="card" style="margin-bottom: 0;">
-            <div class="card-header-flex">
-                <h3 class="card-title">Salary Overview</h3>
-                <a href="{{ route('salary.index') }}" class="btn-secondary btn-sm">Manage Salary</a>
-            </div>
-
-            @if ($activeSalaryRecord)
-                <div style="font-size: 1.75rem; font-weight: 700; color: var(--primary-color); margin-bottom: 0.5rem;">
-                    {{ currency($monthlySalary) }}
-                </div>
-                <div style="display: flex; flex-direction: column; gap: 0.375rem; font-size: 0.875rem; color: var(--text-muted);">
-                    <span>
-                        Payment day:
-                        <strong style="color: var(--text-main);">
-                            @if ($activeSalaryRecord->payment_day)
-                                Day {{ $activeSalaryRecord->payment_day }}{{ ordinal_suffix((int) $activeSalaryRecord->payment_day) }} of month
-                            @else
-                                Not set
-                            @endif
-                        </strong>
+            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                <div
+                    style="
+                        display: flex;
+                        justify-content: space-between;
+                        padding: 0.5rem 0;
+                        border-bottom: 1px solid #f1f5f9;
+                    "
+                >
+                    <span style="font-size: 0.875rem; color: #64748b;">
+                        Current Month Expense
                     </span>
-                    <span>Active salary records: <strong style="color: var(--text-main);">{{ $activeSalaryCount }}</strong></span>
-                    <span>Status: <span class="badge badge-active">Active</span></span>
+
+                    <span style="font-weight: 600; color: #dc2626;">
+                        {{ currency($currentMonthExpenses) }}
+                    </span>
                 </div>
-            @else
-                <div class="empty-state" style="padding: 1.5rem 1rem;">
-                    <div class="empty-state-title">No active salary set.</div>
-                    <p>Add a salary record to include it in your analytics.</p>
+
+                <div
+                    style="
+                        display: flex;
+                        justify-content: space-between;
+                        padding: 0.5rem 0;
+                        border-bottom: 1px solid #f1f5f9;
+                    "
+                >
+                    <span style="font-size: 0.875rem; color: #64748b;">
+                        Previous Month Expense
+                    </span>
+
+                    <span style="font-weight: 600;">
+                        {{ currency($prevMonthExpenses) }}
+                    </span>
                 </div>
-            @endif
+
+                <div
+                    style="
+                        display: flex;
+                        justify-content: space-between;
+                        padding: 0.5rem 0;
+                        border-bottom: 1px solid #f1f5f9;
+                    "
+                >
+                    <span style="font-size: 0.875rem; color: #64748b;">
+                        Expense Trend
+                    </span>
+
+                    <span
+                        style="
+                            font-weight: 600;
+                            color: {{ $expenseGrowthPercent > 0 ? '#dc2626' : '#16a34a' }};
+                        "
+                    >
+                        {{ $expenseGrowthPercent > 0 ? '+' : '' }}{{ $expenseGrowthPercent }}%
+                    </span>
+                </div>
+
+                <div
+                    style="
+                        display: flex;
+                        justify-content: space-between;
+                        padding: 0.5rem 0;
+                    "
+                >
+                    <span style="font-size: 0.875rem; color: #64748b;">
+                        Highest Single Expense
+                    </span>
+
+                    <span style="font-weight: 600; color: #0f172a;">
+                        @if($highestExpenseRecord)
+                            {{ currency($highestExpenseRecord->amount) }}
+                        @else
+                            None
+                        @endif
+                    </span>
+                </div>
+            </div>
         </div>
 
-        <!-- Recurring Finance Overview -->
-        <div class="card" style="margin-bottom: 0;">
-            <div class="card-header-flex">
-                <h3 class="card-title">Recurring Finance</h3>
-                <a href="{{ route('recurring-transactions.index') }}" class="btn-secondary btn-sm">Manage Recurring</a>
-            </div>
+        <!-- Savings Analysis -->
+        <div class="card">
+            <h3 class="card-title" style="margin-bottom: 0.75rem;">
+                Savings Analysis
+            </h3>
 
-            <div style="display: flex; flex-direction: column; gap: 1rem;">
-                <div style="padding: 0.75rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.375rem;">
-                    <div style="font-size: 0.875rem; color: #64748b;">Active Scheduled Items</div>
-                    <div style="font-size: 1.25rem; font-weight: 700; color: #0f172a;">{{ $activeRecurringCount }} Items</div>
+            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                <div
+                    style="
+                        display: flex;
+                        justify-content: space-between;
+                        padding: 0.5rem 0;
+                        border-bottom: 1px solid #f1f5f9;
+                    "
+                >
+                    <span style="font-size: 0.875rem; color: #64748b;">
+                        Savings Target
+                    </span>
+
+                    <span style="font-weight: 600;">
+                        {{ currency($targetSavings) }}
+                    </span>
                 </div>
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
-                    <div style="padding: 0.75rem; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 0.375rem;">
-                        <div style="font-size: 0.75rem; color: #166534; font-weight: 600;">Monthly Recurring Income</div>
-                        <div style="font-size: 1rem; font-weight: 700; color: #16a34a;">{{ currency($recurringIncomeTotal, false) }}</div>
-                    </div>
-                    <div style="padding: 0.75rem; background: #fef2f2; border: 1px solid #fecaca; border-radius: 0.375rem;">
-                        <div style="font-size: 0.75rem; color: #991b1b; font-weight: 600;">Monthly Recurring Expense</div>
-                        <div style="font-size: 1rem; font-weight: 700; color: #dc2626;">{{ currency($recurringExpenseTotal, false) }}</div>
-                    </div>
+                <div
+                    style="
+                        display: flex;
+                        justify-content: space-between;
+                        padding: 0.5rem 0;
+                        border-bottom: 1px solid #f1f5f9;
+                    "
+                >
+                    <span style="font-size: 0.875rem; color: #64748b;">
+                        Current Saved
+                    </span>
+
+                    <span style="font-weight: 600; color: #2563eb;">
+                        {{ currency($currentSavings) }}
+                    </span>
+                </div>
+
+                <div
+                    style="
+                        display: flex;
+                        justify-content: space-between;
+                        padding: 0.5rem 0;
+                    "
+                >
+                    <span style="font-size: 0.875rem; color: #64748b;">
+                        Savings Ratio vs Income
+                    </span>
+
+                    <span style="font-weight: 600; color: #2563eb;">
+                        {{ $savingsPercentage }}%
+                    </span>
+                </div>
+
+                <div
+                    style="
+                        background: #e2e8f0;
+                        height: 8px;
+                        border-radius: 4px;
+                        overflow: hidden;
+                        margin-top: 0.25rem;
+                    "
+                >
+                    <div
+                        style="
+                            background: #2563eb;
+                            height: 100%;
+                            width: {{ $savingsPercentage }}%;
+                        "
+                    ></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Salary and Recurring Overview -->
+        <div class="card">
+            <h3 class="card-title" style="margin-bottom: 0.75rem;">
+                Salary & Scheduled Overview
+            </h3>
+
+            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                <div
+                    style="
+                        display: flex;
+                        justify-content: space-between;
+                        padding: 0.5rem 0;
+                        border-bottom: 1px solid #f1f5f9;
+                    "
+                >
+                    <span style="font-size: 0.875rem; color: #64748b;">
+                        Monthly Fixed Salary
+                    </span>
+
+                    <span style="font-weight: 600; color: #0f172a;">
+                        {{ currency($monthlySalary) }}
+                    </span>
+                </div>
+
+                <div
+                    style="
+                        display: flex;
+                        justify-content: space-between;
+                        padding: 0.5rem 0;
+                        border-bottom: 1px solid #f1f5f9;
+                    "
+                >
+                    <span style="font-size: 0.875rem; color: #64748b;">
+                        Salary Payment Day
+                    </span>
+
+                    <span style="font-weight: 600;">
+                        @if($activeSalaryRecord && $activeSalaryRecord->payment_day)
+                            Day {{ $activeSalaryRecord->payment_day }}
+                        @else
+                            Not Set
+                        @endif
+                    </span>
+                </div>
+
+                <div
+                    style="
+                        display: flex;
+                        justify-content: space-between;
+                        padding: 0.5rem 0;
+                        border-bottom: 1px solid #f1f5f9;
+                    "
+                >
+                    <span style="font-size: 0.875rem; color: #64748b;">
+                        Active Recurring Items
+                    </span>
+
+                    <span style="font-weight: 600;">
+                        {{ $activeRecurringCount }} Items
+                    </span>
+                </div>
+
+                <div
+                    style="
+                        display: flex;
+                        justify-content: space-between;
+                        padding: 0.5rem 0;
+                    "
+                >
+                    <span style="font-size: 0.875rem; color: #64748b;">
+                        Scheduled Monthly Net
+                    </span>
+
+                    <span
+                        style="
+                            font-weight: 600;
+                            color: {{ $netRecurringAmount >= 0 ? '#16a34a' : '#dc2626' }};
+                        "
+                    >
+                        {{ currency($netRecurringAmount) }}
+                    </span>
                 </div>
 
                 <div style="font-size: 0.8125rem; color: var(--text-muted);">
@@ -173,115 +482,69 @@
     </div>
 
     <!-- Recent Transactions -->
-    <div class="dashboard-tx-grid">
-        <!-- Recent Income -->
-        <div class="card">
-            <div class="card-header-flex">
-                <h2 class="card-title">Recent Income</h2>
-                <a href="{{ route('income.index') }}" class="btn-secondary btn-sm">View All</a>
+    <div class="card">
+        <div class="card-header-flex">
+            <div>
+                <h3 class="card-title">Recent Transactions Activity</h3>
+                <p class="card-subtitle">
+                    Unified activity log across Income and Expenses
+                </p>
             </div>
-
-            @if ($recentIncome->count() > 0)
-                <div class="data-table-container">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Amount</th>
-                                <th>Description</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($recentIncome as $inc)
-                                <tr>
-                                    <td>{{ \Carbon\Carbon::parse($inc->date)->format('M d, Y') }}</td>
-                                    <td class="text-amount-income">{{ currency($inc->amount) }}</td>
-                                    <td>{{ $inc->description ?? '-' }}</td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            @else
-                <div class="empty-state">
-                    <div class="empty-state-title">No recent income records found.</div>
-                </div>
-            @endif
         </div>
 
-        <!-- Recent Expenses -->
-        <div class="card">
-            <div class="card-header-flex">
-                <h2 class="card-title">Recent Expenses</h2>
-                <a href="{{ route('expenses.index') }}" class="btn-secondary btn-sm">View All</a>
-            </div>
+        @if($recentTransactions->count() > 0)
+            <div class="data-table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Description</th>
+                            <th>Date</th>
+                            <th style="text-align: right;">Amount</th>
+                        </tr>
+                    </thead>
 
-            @if ($recentExpenses->count() > 0)
-                <div class="data-table-container">
-                    <table class="data-table">
-                        <thead>
+                    <tbody>
+                        @foreach($recentTransactions as $tx)
                             <tr>
-                                <th>Date</th>
-                                <th>Amount</th>
-                                <th>Description</th>
+                                <td>
+                                    @if($tx['type'] === 'income')
+                                        <span class="badge badge-income">Income</span>
+                                    @else
+                                        <span class="badge badge-expense">Expense</span>
+                                    @endif
+                                </td>
+
+                                <td style="font-weight: 500;">
+                                    {{ $tx['title'] }}
+                                </td>
+
+                                <td>
+                                    {{ \Carbon\Carbon::parse($tx['date'])->format('M d, Y') }}
+                                </td>
+
+                                <td
+                                    style="text-align: right;"
+                                    class="{{ $tx['type'] === 'income' ? 'text-amount-income' : 'text-amount-expense' }}"
+                                >
+                                    {{ $tx['type'] === 'income' ? '+' : '-' }}
+                                    {{ currency($tx['amount']) }}
+                                </td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($recentExpenses as $exp)
-                                <tr>
-                                    <td>{{ \Carbon\Carbon::parse($exp->date)->format('M d, Y') }}</td>
-                                    <td class="text-amount-expense">{{ currency($exp->amount) }}</td>
-                                    <td>{{ $exp->description ?? '-' }}</td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        @else
+            <div class="empty-state">
+                <div class="empty-state-title">
+                    No recent activity recorded
                 </div>
-            @else
-                <div class="empty-state">
-                    <div class="empty-state-title">No recent expense records found.</div>
-                </div>
-            @endif
-        </div>
+
+                <p style="font-size: 0.875rem;">
+                    Your financial transactions will appear here once you add income or expense items.
+                </p>
+            </div>
+        @endif
     </div>
-
-    <!-- Chart.js for the Monthly Income vs Expense chart -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const moneyCanvas = document.getElementById('moneyMonthlyChart');
-            if (moneyCanvas) {
-                new Chart(moneyCanvas.getContext('2d'), {
-                    type: 'bar',
-                    data: {
-                        labels: @json($monthlyChartLabels),
-                        datasets: [
-                            {
-                                label: 'Total Income ({{ currency_label() }})',
-                                data: @json($monthlyIncomeData),
-                                backgroundColor: '#22c55e',
-                                borderRadius: 4
-                            },
-                            {
-                                label: 'Total Expenses ({{ currency_label() }})',
-                                data: @json($monthlyExpenseData),
-                                backgroundColor: '#ef4444',
-                                borderRadius: 4
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: { position: 'top' }
-                        },
-                        scales: {
-                            y: { beginAtZero: true }
-                        }
-                    }
-                });
-            }
-        });
-    </script>
 </x-app-layout>

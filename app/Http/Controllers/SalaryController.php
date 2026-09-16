@@ -39,7 +39,10 @@ class SalaryController extends Controller
      */
     private function syncLegacySalary(User $user): void
     {
-        $activeSum = $user->salaries()->where('is_active', true)->sum('amount');
+        $activeSum = $user->salaries()
+            ->where('is_active', true)
+            ->sum('amount');
+
         $user->update(['salary' => $activeSum]);
     }
 
@@ -66,7 +69,8 @@ class SalaryController extends Controller
 
         $this->syncLegacySalary($request->user());
 
-        return redirect()->route('salary.index')->with('status', 'Salary record added successfully.');
+        return redirect()->route('salary.index')
+            ->with('status', 'Salary record added successfully.');
     }
 
     /**
@@ -114,7 +118,8 @@ class SalaryController extends Controller
 
         $this->syncLegacySalary($request->user());
 
-        return redirect()->route('salary.index')->with('status', 'Salary record updated successfully.');
+        return redirect()->route('salary.index')
+            ->with('status', 'Salary record updated successfully.');
     }
 
     /**
@@ -127,10 +132,12 @@ class SalaryController extends Controller
         }
 
         $user = $salary->user;
+
         $salary->delete();
 
         $this->syncLegacySalary($user);
 
-        return redirect()->route('salary.index')->with('status', 'Salary record deleted successfully.');
+        return redirect()->route('salary.index')
+            ->with('status', 'Salary record deleted successfully.');
     }
 }
