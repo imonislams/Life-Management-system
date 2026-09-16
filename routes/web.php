@@ -44,6 +44,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/savings', [SavingsController::class, 'index'])->name('savings.index');
     Route::post('/savings', [SavingsController::class, 'storeOrUpdate'])->name('savings.store');
     Route::post('/savings/add-money', [SavingsController::class, 'addMoney'])->name('savings.add-money');
+    Route::delete('/savings', [SavingsController::class, 'destroy'])->name('savings.destroy');
+    Route::post('/savings/records', [SavingsController::class, 'storeRecord'])->name('savings.records.store');
+    Route::delete('/savings/records/{savingsRecord}', [SavingsController::class, 'destroyRecord'])->name('savings.records.destroy');
 
     // Income resource routes
     Route::resource('income', IncomeController::class)->except(['show']);

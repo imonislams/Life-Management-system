@@ -45,7 +45,7 @@
                                 </td>
                                 <td><strong>{{ $record->title }}</strong></td>
                                 <td class="{{ $record->type === 'income' ? 'text-amount-income' : 'text-amount-expense' }}">
-                                    ৳ {{ number_format($record->amount, 2) }} TK
+                                    {{ currency($record->amount) }}
                                 </td>
                                 <td style="text-transform: capitalize;">{{ $record->recurrence_type }}</td>
                                 <td>{{ \Carbon\Carbon::parse($record->next_due_date)->format('M d, Y') }}</td>

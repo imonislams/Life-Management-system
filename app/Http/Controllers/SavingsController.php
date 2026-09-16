@@ -3,10 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\SavingsGoal;
+use App\Models\SavingsRecord;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Auth;
 
 class SavingsController extends Controller
 {
@@ -14,7 +17,7 @@ class SavingsController extends Controller
      * Calculate current month's available balance for a user.
      * Available Balance = Total Income - Total Expenses - Total Savings
      */
-    private function getAvailableBalance($user): float
+    private function getAvailableBalance(User $user): float
     {
         $now = Carbon::now();
         $monthlySalary = (float) ($user->salary ?? 0);
@@ -53,7 +56,22 @@ class SavingsController extends Controller
 
         $availableBalance = $this->getAvailableBalance($user);
 
-        return view('savings.index', compact('savingsGoal', 'remainingAmount', 'progressPercentage', 'availableBalance'));
+        $savingsRecords = $user->savingsRecords()
+            ->orderBy('date', 'desc')
+            ->orderBy('id', 'desc')
+            ->paginate(10)
+            ->withQueryString();
+
+        $totalSaved = (float) $user->savingsRecords()->sum('amount');
+
+        return view('savings.index', compact(
+            'savingsGoal',
+            'remainingAmount',
+            'progressPercentage',
+            'availableBalance',
+            'savingsRecords',
+            'totalSaved'
+        ));
     }
 
     public function storeOrUpdate(Request $request): RedirectResponse
@@ -113,5 +131,75 @@ class SavingsController extends Controller
         $savingsGoal->save();
 
         return redirect()->route('savings.index')->with('status', 'Money added to savings successfully.');
+    }
+
+    /**
+     * Remove the authenticated user's savings goal.
+     */
+    public function destroy(Request $request): RedirectResponse
+    {
+        $savingsGoal = $request->user()->savingsGoal;
+
+        if (! $savingsGoal) {
+            return redirect()->route('savings.index')->with('status', 'No savings goal to delete.');
+        }
+
+        $savingsGoal->delete();
+
+        return redirect()->route('savings.index')->with('status', 'Savings goal deleted successfully.');
+    }
+
+    /**
+     * Store a new savings deposit (amount, date, description).
+     */
+    public function storeRecord(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'amount' => ['required', 'numeric', 'gt:0', 'max:9999' . '99999.99'],
+            'date' => ['required', 'date'],
+            'description' => ['nullable', 'string', 'max:255'],
+        ]);
+
+        $user = $request->user();
+        $amount = (float) $validated['amount'];
+
+        $availableBalance = $this->getAvailableBalance($user);
+
+        if ($amount > $availableBalance) {
+            return back()->withErrors(['amount' => 'Insufficient available balance.'])->withInput();
+        }
+
+        $user->savingsRecords()->create($validated);
+
+        // Reflect the deposit on the savings goal when one exists.
+        if ($user->savingsGoal) {
+            $user->savingsGoal->current_amount = (float) $user->savingsGoal->current_amount + $amount;
+            $user->savingsGoal->save();
+        }
+
+        return redirect()->route('savings.index')->with('status', 'Savings added successfully.');
+    }
+
+    /**
+     * Remove a savings deposit record.
+     */
+    public function destroyRecord(Request $request, SavingsRecord $savingsRecord): RedirectResponse
+    {
+        if ($savingsRecord->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $user = $request->user();
+        $amount = (float) $savingsRecord->amount;
+
+        $savingsRecord->delete();
+
+        // Reduce the savings goal by the removed deposit (never below zero).
+        if ($user->savingsGoal) {
+            $user->savingsGoal->current_amount = max(0, (float) $user->savingsGoal->current_amount - $amount);
+            $user->savingsGoal->save();
+        }
+
+        return redirect()->route('savings.index')->with('status', 'Savings record deleted successfully.');
     }
 }

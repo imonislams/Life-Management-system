@@ -1,5 +1,5 @@
 <x-app-layout>
-    <x-slot name="title">Add Income - Personal Life Management System</x-slot>
+    <x-slot name="title">Add Income - Personal Finance Management System</x-slot>
     <x-slot name="pageTitle">Income</x-slot>
 
     <div class="card" style="max-width: 600px; margin: 0 auto;">
@@ -10,7 +10,7 @@
             @csrf
 
             <div class="form-group">
-                <label for="amount" class="form-label">Amount (TK)</label>
+                <label for="amount" class="form-label">Amount ({{ currency_label() }})</label>
                 <input
                     id="amount"
                     type="number"
