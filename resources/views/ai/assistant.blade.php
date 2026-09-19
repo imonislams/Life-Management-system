@@ -219,12 +219,7 @@ default => 'badge-expense',
 
             document.querySelectorAll('.js-delete-conversation').forEach(function(btn) {
                 btn.addEventListener('click', function() {
-                    // Centralized confirmation modal (no native confirm()).
-                    window.Alerts.confirm({
-                        title: 'Delete conversation?',
-                        message: 'Are you sure you want to delete this conversation? This action cannot be undone.',
-                        action: 'Delete'
-                    }, function() {
+                    var doDelete = function() {
                         fetch(btn.dataset.url, {
                             method: 'DELETE',
                             headers: {
@@ -234,7 +229,20 @@ default => 'badge-expense',
                         }).then(function() {
                             window.location = '{{ route('ai.assistant') }}';
                         });
-                    });
+                    };
+
+                    // The centralized alert system is currently disabled, so
+                    // window.Alerts may be undefined. Fall back to the native
+                    // confirm() so this action keeps working.
+                    if (window.Alerts && typeof window.Alerts.confirm === 'function') {
+                        window.Alerts.confirm({
+                            title: 'Delete conversation?',
+                            message: 'Are you sure you want to delete this conversation? This action cannot be undone.',
+                            action: 'Delete'
+                        }, doDelete);
+                    } else if (window.confirm('Are you sure you want to delete this conversation? This action cannot be undone.')) {
+                        doDelete();
+                    }
                 });
             });
         });

@@ -7,6 +7,13 @@ modal for destructive actions.
 It is loaded once in the main layout and available on **every** authenticated page,
 so no page needs its own alert or modal markup.
 
+> **STATUS: DISABLED.** The alert system is currently **not mounted globally**. Its
+> files are preserved on disk, but `<x-toast />` / `<x-confirm-modal />` are not
+> rendered and `resources/js/alerts.js` is not imported, so the application behaves
+> as it did before the alert integration. The `data-confirm*` attributes on forms
+> remain inert (they do nothing while the module is unloaded). See
+> `docs/CHANGELOG.md` for the restoration note.
+
 ---
 
 ## 1. Architecture
