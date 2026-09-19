@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Currency;
 use App\Models\IncomeRecord;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class IncomeController extends Controller
 {
@@ -29,13 +31,33 @@ class IncomeController extends Controller
             }
         }
 
-        $incomeRecords = $query->orderBy('date', 'desc')
+        // Search across description / source / category.
+        if ($request->filled('search')) {
+            $term = $request->input('search');
+            $query->where(function ($q) use ($term) {
+                $q->where('description', 'like', '%' . $term . '%')
+                    ->orWhere('source', 'like', '%' . $term . '%')
+                    ->orWhere('category', 'like', '%' . $term . '%');
+            });
+        }
+
+        $sort = $request->input('sort', 'date');
+        $direction = $request->input('direction') === 'asc' ? 'asc' : 'desc';
+        $sortable = ['date', 'amount', 'id'];
+        $sort = in_array($sort, $sortable, true) ? $sort : 'date';
+
+        $incomeRecords = $query->with('currency')
+                              ->orderBy($sort, $direction)
                               ->orderBy('id', 'desc')
                               ->paginate(10)
                               ->withQueryString();
 
+        $totalAmount = (float) $request->user()->incomeRecords()->sum('amount');
+
         return view('income.index', [
             'incomeRecords' => $incomeRecords,
+            'totalAmount' => $totalAmount,
+            'currencies' => $this->activeCurrencies(),
         ]);
     }
 
@@ -44,7 +66,10 @@ class IncomeController extends Controller
      */
     public function create()
     {
-        return view('income.create');
+        return view('income.create', [
+            'currencies' => $this->activeCurrencies(),
+            'defaultCurrency' => Currency::defaultFor(Auth::id()),
+        ]);
     }
 
     /**
@@ -56,9 +81,28 @@ class IncomeController extends Controller
             'amount' => ['required', 'numeric', 'gt:0', 'max:999999999.99'],
             'date' => ['required', 'date'],
             'description' => ['nullable', 'string', 'max:255'],
+            'source' => ['nullable', 'string', 'max:255'],
+            'category' => ['nullable', 'string', 'max:255'],
+            'notes' => ['nullable', 'string', 'max:2000'],
+            'currency_id' => ['nullable', Rule::exists('currencies', 'id')->where('user_id', $request->user()->id)],
         ]);
 
-        $request->user()->incomeRecords()->create($validated);
+        // Resolve the selected currency (only the user's own currencies are valid),
+        // falling back to the system default currency from Settings. The code is
+        // snapshotted so the original currency is preserved even if the system
+        // default later changes.
+        $currency = $this->resolveCurrency($request->input('currency_id'), $request->user()->id);
+
+        $request->user()->incomeRecords()->create([
+            'amount' => $validated['amount'],
+            'date' => $validated['date'],
+            'description' => $validated['description'] ?? null,
+            'source' => $validated['source'] ?? null,
+            'category' => $validated['category'] ?? null,
+            'notes' => $validated['notes'] ?? null,
+            'currency_id' => $currency?->id,
+            'currency_code' => $currency?->code ?? Currency::systemDefaultCode($request->user()->id),
+        ]);
 
         return redirect()->route('income.index')->with('status', 'Income record added successfully.');
     }
@@ -75,6 +119,8 @@ class IncomeController extends Controller
 
         return view('income.edit', [
             'income' => $income,
+            'currencies' => $this->activeCurrencies(),
+            'defaultCurrency' => Currency::defaultFor(Auth::id()),
         ]);
     }
 
@@ -92,11 +138,60 @@ class IncomeController extends Controller
             'amount' => ['required', 'numeric', 'gt:0', 'max:999999999.99'],
             'date' => ['required', 'date'],
             'description' => ['nullable', 'string', 'max:255'],
+            'source' => ['nullable', 'string', 'max:255'],
+            'category' => ['nullable', 'string', 'max:255'],
+            'notes' => ['nullable', 'string', 'max:2000'],
+            'currency_id' => ['nullable', Rule::exists('currencies', 'id')->where('user_id', $request->user()->id)],
         ]);
 
-        $income->update($validated);
+        $payload = [
+            'amount' => $validated['amount'],
+            'date' => $validated['date'],
+            'description' => $validated['description'] ?? null,
+            'source' => $validated['source'] ?? null,
+            'category' => $validated['category'] ?? null,
+            'notes' => $validated['notes'] ?? null,
+        ];
+
+        // Only change the record's currency when the user explicitly picks one.
+        if ($request->filled('currency_id')) {
+            $currency = $this->resolveCurrency($request->input('currency_id'), $request->user()->id);
+            $payload['currency_id'] = $currency?->id;
+            $payload['currency_code'] = $currency?->code;
+        }
+
+        $income->update($payload);
 
         return redirect()->route('income.index')->with('status', 'Income record updated successfully.');
+    }
+
+    /**
+     * Active currencies belonging to the authenticated user (inactive ones are
+     * hidden from new-record forms but remain visible on existing records).
+     */
+    private function activeCurrencies()
+    {
+        return Currency::ownedBy(Auth::id())->active()
+            ->orderByDesc('is_default')
+            ->orderBy('sort_order')
+            ->orderBy('code')
+            ->get();
+    }
+
+    /**
+     * Resolve a submitted currency id against the user's own currencies,
+     * falling back to their default currency. Never trusts the raw input.
+     */
+    private function resolveCurrency($currencyId, int $userId): ?Currency
+    {
+        if ($currencyId) {
+            $currency = Currency::ownedBy($userId)->active()->find($currencyId);
+            if ($currency) {
+                return $currency;
+            }
+        }
+
+        return Currency::defaultFor($userId);
     }
 
     /**

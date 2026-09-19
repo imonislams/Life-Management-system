@@ -192,8 +192,38 @@ class MoneyManagementController extends Controller
             ->take(8)
             ->values();
 
+        // 10. Multi-currency safety: totals grouped by currency code so amounts
+        // in different currencies are never silently added together.
+        $incomeByCurrency = $user->incomeRecords()
+            ->select('currency_code', \Illuminate\Support\Facades\DB::raw('SUM(amount) as total'))
+            ->groupBy('currency_code')
+            ->get()
+            ->map(fn ($row) => ['code' => $row->currency_code ?: '—', 'total' => (float) $row->total]);
+
+        $expenseByCurrency = $user->expenseRecords()
+            ->select('currency_code', \Illuminate\Support\Facades\DB::raw('SUM(amount) as total'))
+            ->groupBy('currency_code')
+            ->get()
+            ->map(fn ($row) => ['code' => $row->currency_code ?: '—', 'total' => (float) $row->total]);
+
+        $salaryByCurrency = $user->salaries()
+            ->select('currency_code', \Illuminate\Support\Facades\DB::raw('SUM(amount) as total'))
+            ->groupBy('currency_code')
+            ->get()
+            ->map(fn ($row) => ['code' => $row->currency_code ?: '—', 'total' => (float) $row->total]);
+
+        $savingsByCurrency = $user->savingsGoals()
+            ->select('currency_code', \Illuminate\Support\Facades\DB::raw('SUM(current_amount) as total'))
+            ->groupBy('currency_code')
+            ->get()
+            ->map(fn ($row) => ['code' => $row->currency_code ?: '—', 'total' => (float) $row->total]);
+
         return view('money-management.index', compact(
             'period',
+            'incomeByCurrency',
+            'expenseByCurrency',
+            'salaryByCurrency',
+            'savingsByCurrency',
             'monthlySalary',
             'activeSalaryRecord',
             'additionalIncome',

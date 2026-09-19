@@ -30,7 +30,7 @@
         <div class="summary-card">
             <div class="summary-card-title">Total Income</div>
             <div class="summary-card-value income-color">
-                ৳ {{ number_format($totalIncome, 2) }} TK
+                <x-money :amount="$totalIncome" />
             </div>
         </div>
 
@@ -38,7 +38,7 @@
         <div class="summary-card">
             <div class="summary-card-title">Total Salary</div>
             <div class="summary-card-value">
-                ৳ {{ number_format($monthlySalary, 2) }} TK
+                <x-money :amount="$monthlySalary" />
             </div>
         </div>
 
@@ -46,7 +46,7 @@
         <div class="summary-card">
             <div class="summary-card-title">Total Expense</div>
             <div class="summary-card-value expense-color">
-                ৳ {{ number_format($totalExpenses, 2) }} TK
+                <x-money :amount="$totalExpenses" />
             </div>
         </div>
 
@@ -54,7 +54,7 @@
         <div class="summary-card">
             <div class="summary-card-title">Total Savings</div>
             <div class="summary-card-value" style="color: #2563eb;">
-                ৳ {{ number_format($currentSavings, 2) }} TK
+                <x-money :amount="$currentSavings" />
             </div>
         </div>
 
@@ -62,7 +62,7 @@
         <div class="summary-card">
             <div class="summary-card-title">Available Balance</div>
             <div class="summary-card-value balance-color">
-                ৳ {{ number_format($availableBalance, 2) }} TK
+                <x-money :amount="$availableBalance" />
             </div>
         </div>
 
@@ -70,7 +70,7 @@
         <div class="summary-card">
             <div class="summary-card-title">Net Recurring</div>
             <div class="summary-card-value" style="color: {{ $netRecurringAmount >= 0 ? '#16a34a' : '#dc2626' }};">
-                ৳ {{ number_format($netRecurringAmount, 2) }} TK
+                <x-money :amount="$netRecurringAmount" />
             </div>
         </div>
     </div>
@@ -101,11 +101,11 @@
                 <div style="display: flex; flex-direction: column; align-items: center; min-width: 60px; flex: 1;">
                     <div style="display: flex; align-items: flex-end; gap: 6px; height: 160px;">
                         <!-- Income Bar -->
-                        <div title="Income: ৳ {{ number_format($bar['income'], 2) }}"
+                        <div title="Income: <x-money :amount="$bar['income']" />"
                              style="width: 18px; height: {{ $incHeight }}px; background-color: #16a34a; border-radius: 3px 3px 0 0; transition: height 0.3s;">
                         </div>
                         <!-- Expense Bar -->
-                        <div title="Expense: ৳ {{ number_format($bar['expense'], 2) }}"
+                        <div title="Expense: <x-money :amount="$bar['expense']" />"
                              style="width: 18px; height: {{ $expHeight }}px; background-color: #dc2626; border-radius: 3px 3px 0 0; transition: height 0.3s;">
                         </div>
                     </div>
@@ -123,11 +123,11 @@
             <div style="display: flex; flex-direction: column; gap: 0.75rem;">
                 <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid #f1f5f9;">
                     <span style="font-size: 0.875rem; color: #64748b;">Current Month Expense</span>
-                    <span style="font-weight: 600; color: #dc2626;">৳ {{ number_format($currentMonthExpenses, 2) }}</span>
+                    <span style="font-weight: 600; color: #dc2626;"><x-money :amount="$currentMonthExpenses" /></span>
                 </div>
                 <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid #f1f5f9;">
                     <span style="font-size: 0.875rem; color: #64748b;">Previous Month Expense</span>
-                    <span style="font-weight: 600;">৳ {{ number_format($prevMonthExpenses, 2) }}</span>
+                    <span style="font-weight: 600;"><x-money :amount="$prevMonthExpenses" /></span>
                 </div>
                 <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid #f1f5f9;">
                     <span style="font-size: 0.875rem; color: #64748b;">Expense Trend</span>
@@ -139,7 +139,7 @@
                     <span style="font-size: 0.875rem; color: #64748b;">Highest Single Expense</span>
                     <span style="font-weight: 600; color: #0f172a;">
                         @if($highestExpenseRecord)
-                            ৳ {{ number_format($highestExpenseRecord->amount, 2) }}
+                            <x-money :amount="$highestExpenseRecord->amount" />
                         @else
                             None
                         @endif
@@ -154,11 +154,11 @@
             <div style="display: flex; flex-direction: column; gap: 0.75rem;">
                 <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid #f1f5f9;">
                     <span style="font-size: 0.875rem; color: #64748b;">Savings Target</span>
-                    <span style="font-weight: 600;">৳ {{ number_format($targetSavings, 2) }}</span>
+                    <span style="font-weight: 600;"><x-money :amount="$targetSavings" /></span>
                 </div>
                 <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid #f1f5f9;">
                     <span style="font-size: 0.875rem; color: #64748b;">Current Saved</span>
-                    <span style="font-weight: 600; color: #2563eb;">৳ {{ number_format($currentSavings, 2) }}</span>
+                    <span style="font-weight: 600; color: #2563eb;"><x-money :amount="$currentSavings" /></span>
                 </div>
                 <div style="display: flex; justify-content: space-between; padding: 0.5rem 0;">
                     <span style="font-size: 0.875rem; color: #64748b;">Savings Ratio vs Income</span>
@@ -177,7 +177,7 @@
             <div style="display: flex; flex-direction: column; gap: 0.75rem;">
                 <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid #f1f5f9;">
                     <span style="font-size: 0.875rem; color: #64748b;">Monthly Fixed Salary</span>
-                    <span style="font-weight: 600; color: #0f172a;">৳ {{ number_format($monthlySalary, 2) }}</span>
+                    <span style="font-weight: 600; color: #0f172a;"><x-money :amount="$monthlySalary" /></span>
                 </div>
                 <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid #f1f5f9;">
                     <span style="font-size: 0.875rem; color: #64748b;">Salary Payment Day</span>
@@ -192,9 +192,69 @@
                 <div style="display: flex; justify-content: space-between; padding: 0.5rem 0;">
                     <span style="font-size: 0.875rem; color: #64748b;">Scheduled Monthly Net</span>
                     <span style="font-weight: 600; color: {{ $netRecurringAmount >= 0 ? '#16a34a' : '#dc2626' }};">
-                        ৳ {{ number_format($netRecurringAmount, 2) }}
+                        <x-money :amount="$netRecurringAmount" />
                     </span>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Currency Breakdown (multi-currency safety) -->
+    <div class="card">
+        <div class="card-header-flex">
+            <div>
+                <h3 class="card-title">Totals by Currency</h3>
+                <p class="card-subtitle">Amounts in different currencies are shown separately and never summed together.</p>
+            </div>
+        </div>
+
+        <div class="dashboard-tx-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
+            <div style="border:1px solid var(--border-color); border-radius:0.5rem; padding:1rem;">
+                <h4 style="font-size:0.9rem; font-weight:600; margin-bottom:0.5rem;">Income</h4>
+                @forelse($incomeByCurrency as $row)
+                    <div style="display:flex; justify-content:space-between; font-size:0.85rem; padding:0.2rem 0;">
+                        <span class="badge badge-active">{{ $row['code'] }}</span>
+                        <span class="text-amount-income">{{ number_format($row['total'], 2) }}</span>
+                    </div>
+                @empty
+                    <div style="font-size:0.8rem; color:#94a3b8; font-style:italic;">No income recorded.</div>
+                @endforelse
+            </div>
+
+            <div style="border:1px solid var(--border-color); border-radius:0.5rem; padding:1rem;">
+                <h4 style="font-size:0.9rem; font-weight:600; margin-bottom:0.5rem;">Salary</h4>
+                @forelse($salaryByCurrency as $row)
+                    <div style="display:flex; justify-content:space-between; font-size:0.85rem; padding:0.2rem 0;">
+                        <span class="badge badge-active">{{ $row['code'] }}</span>
+                        <span>{{ number_format($row['total'], 2) }}</span>
+                    </div>
+                @empty
+                    <div style="font-size:0.8rem; color:#94a3b8; font-style:italic;">No salary recorded.</div>
+                @endforelse
+            </div>
+
+            <div style="border:1px solid var(--border-color); border-radius:0.5rem; padding:1rem;">
+                <h4 style="font-size:0.9rem; font-weight:600; margin-bottom:0.5rem;">Expenses</h4>
+                @forelse($expenseByCurrency as $row)
+                    <div style="display:flex; justify-content:space-between; font-size:0.85rem; padding:0.2rem 0;">
+                        <span class="badge badge-expense">{{ $row['code'] }}</span>
+                        <span class="text-amount-expense">{{ number_format($row['total'], 2) }}</span>
+                    </div>
+                @empty
+                    <div style="font-size:0.8rem; color:#94a3b8; font-style:italic;">No expenses recorded.</div>
+                @endforelse
+            </div>
+
+            <div style="border:1px solid var(--border-color); border-radius:0.5rem; padding:1rem;">
+                <h4 style="font-size:0.9rem; font-weight:600; margin-bottom:0.5rem;">Savings</h4>
+                @forelse($savingsByCurrency as $row)
+                    <div style="display:flex; justify-content:space-between; font-size:0.85rem; padding:0.2rem 0;">
+                        <span class="badge badge-active">{{ $row['code'] }}</span>
+                        <span class="balance-color">{{ number_format($row['total'], 2) }}</span>
+                    </div>
+                @empty
+                    <div style="font-size:0.8rem; color:#94a3b8; font-style:italic;">No savings recorded.</div>
+                @endforelse
             </div>
         </div>
     </div>
@@ -230,9 +290,9 @@
                                     @endif
                                 </td>
                                 <td style="font-weight: 500;">{{ $tx['title'] }}</td>
-                                <td>{{ \Carbon\Carbon::parse($tx['date'])->format('M d, Y') }}</td>
+                                <td>{{ user_date($tx['date']) }}</td>
                                 <td style="text-align: right;" class="{{ $tx['type'] === 'income' ? 'text-amount-income' : 'text-amount-expense' }}">
-                                    {{ $tx['type'] === 'income' ? '+' : '-' }} ৳ {{ number_format($tx['amount'], 2) }} TK
+                                    {{ $tx['type'] === 'income' ? '+' : '-' }} <x-money :amount="$tx['amount']" />
                                 </td>
                             </tr>
                         @endforeach

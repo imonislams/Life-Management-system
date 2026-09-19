@@ -10,8 +10,14 @@
             @csrf
             @method('PUT')
 
+            @include('partials.currency-select', [
+                'currencies' => $currencies,
+                'defaultCurrency' => $defaultCurrency,
+                'selectedId' => $salary->currency_id,
+            ])
+
             <div class="form-group">
-                <label for="amount" class="form-label">Monthly Salary Amount (TK) <span style="color: var(--danger-color);">*</span></label>
+                <label for="amount" class="form-label">Monthly Salary Amount <span style="color: var(--danger-color);">*</span></label>
                 <input
                     id="amount"
                     type="number"
@@ -48,6 +54,20 @@
                 @enderror
             </div>
 
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                <div class="form-group">
+                    <label for="employer" class="form-label">Employer / Source (Optional)</label>
+                    <input id="employer" type="text" name="employer" value="{{ old('employer', $salary->employer) }}" class="form-control">
+                    @error('employer')<div class="error-msg">{{ $message }}</div>@enderror
+                </div>
+
+                <div class="form-group">
+                    <label for="salary_date" class="form-label">Salary Date (Optional)</label>
+                    <input id="salary_date" type="date" name="salary_date" value="{{ old('salary_date', optional($salary->salary_date)->format('Y-m-d')) }}" class="form-control">
+                    @error('salary_date')<div class="error-msg">{{ $message }}</div>@enderror
+                </div>
+            </div>
+
             <div class="form-group">
                 <label for="description" class="form-label">Description (Optional)</label>
                 <textarea
@@ -60,6 +80,12 @@
                 @error('description')
                     <div class="error-msg">{{ $message }}</div>
                 @enderror
+            </div>
+
+            <div class="form-group">
+                <label for="notes" class="form-label">Notes (Optional)</label>
+                <textarea id="notes" name="notes" rows="2" class="form-control">{{ old('notes', $salary->notes) }}</textarea>
+                @error('notes')<div class="error-msg">{{ $message }}</div>@enderror
             </div>
 
             <div class="form-group" style="display: flex; align-items: center; gap: 0.5rem; margin-top: 1rem;">

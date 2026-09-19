@@ -37,8 +37,14 @@
                 @enderror
             </div>
 
+            @include('partials.currency-select', [
+                'currencies' => $currencies,
+                'defaultCurrency' => $defaultCurrency,
+                'selectedId' => $recurringTransaction->currency_id,
+            ])
+
             <div class="form-group">
-                <label for="amount" class="form-label">Amount (TK) <span style="color: var(--danger-color);">*</span></label>
+                <label for="amount" class="form-label">Amount <span style="color: var(--danger-color);">*</span></label>
                 <input
                     id="amount"
                     type="number"
@@ -55,15 +61,26 @@
                 @enderror
             </div>
 
-            <div class="form-group">
-                <label for="recurrence_type" class="form-label">Recurrence <span style="color: var(--danger-color);">*</span></label>
-                <select id="recurrence_type" name="recurrence_type" required class="form-control">
-                    <option value="monthly" {{ old('recurrence_type', $recurringTransaction->recurrence_type) === 'monthly' ? 'selected' : '' }}>Monthly</option>
-                    <option value="weekly" {{ old('recurrence_type', $recurringTransaction->recurrence_type) === 'weekly' ? 'selected' : '' }}>Weekly</option>
-                </select>
-                @error('recurrence_type')
-                    <div class="error-msg">{{ $message }}</div>
-                @enderror
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                    <label for="recurrence_type" class="form-label">Recurrence <span style="color: var(--danger-color);">*</span></label>
+                    <select id="recurrence_type" name="recurrence_type" required class="form-control">
+                        @foreach(['daily', 'weekly', 'monthly', 'yearly', 'custom'] as $rt)
+                            <option value="{{ $rt }}" {{ old('recurrence_type', $recurringTransaction->recurrence_type) === $rt ? 'selected' : '' }}>{{ ucfirst($rt) }}</option>
+                        @endforeach
+                    </select>
+                    @error('recurrence_type')
+                        <div class="error-msg">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="form-group">
+                    <label for="interval_days" class="form-label">Custom Interval (days)</label>
+                    <input id="interval_days" type="number" min="1" max="365" name="interval_days" value="{{ old('interval_days', $recurringTransaction->interval_days) }}" class="form-control">
+                    @error('interval_days')
+                        <div class="error-msg">{{ $message }}</div>
+                    @enderror
+                </div>
             </div>
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
@@ -112,18 +129,20 @@
                 @enderror
             </div>
 
-            <div class="form-group" style="display: flex; align-items: center; gap: 0.5rem; margin-top: 1rem;">
-                <input
-                    id="is_active"
-                    type="checkbox"
-                    name="is_active"
-                    value="1"
-                    {{ old('is_active', $recurringTransaction->is_active) ? 'checked' : '' }}
-                    style="width: 18px; height: 18px; cursor: pointer;"
-                >
-                <label for="is_active" class="form-label" style="margin-bottom: 0; cursor: pointer;">
-                    Active Status
-                </label>
+            <div class="form-group">
+                <label for="end_date" class="form-label">End Date (Optional)</label>
+                <input id="end_date" type="date" name="end_date" value="{{ old('end_date', $recurringTransaction->end_date ? $recurringTransaction->end_date->format('Y-m-d') : '') }}" class="form-control">
+                @error('end_date')<div class="error-msg">{{ $message }}</div>@enderror
+            </div>
+
+            <div class="form-group">
+                <label for="status" class="form-label">Status <span style="color: var(--danger-color);">*</span></label>
+                <select id="status" name="status" required class="form-control">
+                    <option value="active" {{ old('status', $recurringTransaction->effectiveStatus()) === 'active' ? 'selected' : '' }}>Active</option>
+                    <option value="paused" {{ old('status', $recurringTransaction->effectiveStatus()) === 'paused' ? 'selected' : '' }}>Paused</option>
+                    <option value="completed" {{ old('status', $recurringTransaction->effectiveStatus()) === 'completed' ? 'selected' : '' }}>Completed</option>
+                </select>
+                @error('status')<div class="error-msg">{{ $message }}</div>@enderror
             </div>
 
             <div style="display: flex; gap: 1rem; align-items: center; margin-top: 1.5rem;">

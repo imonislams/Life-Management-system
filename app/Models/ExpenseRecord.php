@@ -12,9 +12,12 @@ class ExpenseRecord extends Model
 
     protected $fillable = [
         'user_id',
+        'currency_id',
+        'currency_code',
         'amount',
         'date',
         'description',
+        'notes',
     ];
 
     protected function casts(): array
@@ -28,5 +31,13 @@ class ExpenseRecord extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * The currency this record was originally created in.
+     */
+    public function currency(): BelongsTo
+    {
+        return $this->belongsTo(Currency::class);
     }
 }

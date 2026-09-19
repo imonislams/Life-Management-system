@@ -25,6 +25,7 @@ class User extends Authenticatable
         'email',
         'password',
         'salary',
+        'profile_photo_path',
     ];
 
     /**
@@ -61,9 +62,36 @@ class User extends Authenticatable
         return $this->hasMany(ExpenseRecord::class);
     }
 
+    /**
+     * The user's primary savings goal (kept for backward compatibility with the
+     * existing Money Management screens).
+     */
     public function savingsGoal(): HasOne
     {
-        return $this->hasOne(SavingsGoal::class);
+        return $this->hasOne(SavingsGoal::class)->latestOfMany();
+    }
+
+    /**
+     * All savings goals/accounts owned by the user.
+     */
+    public function savingsGoals(): HasMany
+    {
+        return $this->hasMany(SavingsGoal::class);
+    }
+
+    public function savingsTransactions(): HasMany
+    {
+        return $this->hasMany(SavingsTransaction::class);
+    }
+
+    public function habitActivities(): HasMany
+    {
+        return $this->hasMany(HabitActivity::class);
+    }
+
+    public function routineOccurrences(): HasMany
+    {
+        return $this->hasMany(RoutineOccurrence::class);
     }
 
     public function recurringTransactions(): HasMany
@@ -76,8 +104,104 @@ class User extends Authenticatable
         return $this->hasMany(Salary::class);
     }
 
-    public function tasks(): HasMany
+    public function setting(): HasOne
     {
-        return $this->hasMany(Task::class);
+        return $this->hasOne(Setting::class);
+    }
+
+    /**
+     * The user's settings row, created with defaults on first access.
+     */
+    public function settings(): Setting
+    {
+        return Setting::forUser($this->id);
+    }
+
+    public function habits(): HasMany
+    {
+        return $this->hasMany(Habit::class);
+    }
+
+    public function habitCompletions(): HasMany
+    {
+        return $this->hasMany(HabitCompletion::class);
+    }
+
+    public function currencies(): HasMany
+    {
+        return $this->hasMany(Currency::class);
+    }
+
+    /**
+     * The user's single default currency (falls back to the first active one).
+     */
+    public function defaultCurrency(): ?Currency
+    {
+        return Currency::defaultFor($this->id);
+    }
+
+    public function routines(): HasMany
+    {
+        return $this->hasMany(RoutineItem::class);
+    }
+
+    public function goals(): HasMany
+    {
+        return $this->hasMany(Goal::class);
+    }
+
+    public function dailyActivities(): HasMany
+    {
+        return $this->hasMany(DailyActivity::class);
+    }
+
+    public function goalProgressUpdates(): HasMany
+    {
+        return $this->hasMany(GoalProgressUpdate::class);
+    }
+
+    public function events(): HasMany
+    {
+        return $this->hasMany(Event::class);
+    }
+
+    // ------------------------------------------------------------------
+    // AI layer
+    // ------------------------------------------------------------------
+
+    public function aiConversations(): HasMany
+    {
+        return $this->hasMany(AiConversation::class)->orderByDesc('last_message_at')->orderByDesc('id');
+    }
+
+    public function aiMessages(): HasMany
+    {
+        return $this->hasMany(AiMessage::class);
+    }
+
+    /**
+     * The user's derived semantic-index rows (rebuildable, never authoritative).
+     */
+    public function aiEmbeddings(): HasMany
+    {
+        return $this->hasMany(AiEmbedding::class);
+    }
+
+    public function aiSetting(): HasOne
+    {
+        return $this->hasOne(AiSetting::class);
+    }
+
+    /**
+     * The user's AI settings row, created with defaults on first access.
+     */
+    public function aiSettings(): AiSetting
+    {
+        return AiSetting::forUser($this->id);
+    }
+
+    public function aiTrainingSamples(): HasMany
+    {
+        return $this->hasMany(AiTrainingSample::class);
     }
 }

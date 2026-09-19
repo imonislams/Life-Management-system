@@ -11,7 +11,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        // Apply the authenticated user's saved timezone for each web request.
+        $middleware->web(append: [
+            \App\Http\Middleware\ApplyUserPreferences::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

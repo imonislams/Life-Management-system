@@ -11,7 +11,7 @@
             @method('PUT')
 
             <div class="form-group">
-                <label for="amount" class="form-label">Amount (TK)</label>
+                <label for="amount" class="form-label">Amount</label>
                 <input
                     id="amount"
                     type="number"
@@ -43,6 +43,26 @@
                 @enderror
             </div>
 
+            @include('partials.currency-select', [
+                'currencies' => $currencies,
+                'defaultCurrency' => $defaultCurrency,
+                'selectedId' => $income->currency_id,
+            ])
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                <div class="form-group">
+                    <label for="source" class="form-label">Source (Optional)</label>
+                    <input id="source" type="text" name="source" value="{{ old('source', $income->source) }}" class="form-control">
+                    @error('source')<div class="error-msg">{{ $message }}</div>@enderror
+                </div>
+
+                <div class="form-group">
+                    <label for="category" class="form-label">Category (Optional)</label>
+                    <input id="category" type="text" name="category" value="{{ old('category', $income->category) }}" class="form-control">
+                    @error('category')<div class="error-msg">{{ $message }}</div>@enderror
+                </div>
+            </div>
+
             <div class="form-group">
                 <label for="description" class="form-label">Description (Optional)</label>
                 <input
@@ -55,6 +75,12 @@
                 @error('description')
                     <div class="error-msg">{{ $message }}</div>
                 @enderror
+            </div>
+
+            <div class="form-group">
+                <label for="notes" class="form-label">Notes (Optional)</label>
+                <textarea id="notes" name="notes" rows="2" class="form-control">{{ old('notes', $income->notes) }}</textarea>
+                @error('notes')<div class="error-msg">{{ $message }}</div>@enderror
             </div>
 
             <div style="display: flex; gap: 1rem; align-items: center; margin-top: 1.5rem;">

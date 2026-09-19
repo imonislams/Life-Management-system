@@ -11,7 +11,7 @@
             @method('PUT')
 
             <div class="form-group">
-                <label for="amount" class="form-label">Amount (TK)</label>
+                <label for="amount" class="form-label">Amount</label>
                 <input
                     id="amount"
                     type="number"
@@ -27,6 +27,12 @@
                     <div class="error-msg">{{ $message }}</div>
                 @enderror
             </div>
+
+            @include('partials.currency-select', [
+                'currencies' => $currencies,
+                'defaultCurrency' => $defaultCurrency,
+                'selectedId' => $expense->currency_id,
+            ])
 
             <div class="form-group">
                 <label for="date" class="form-label">Date</label>
@@ -55,6 +61,12 @@
                 @error('description')
                     <div class="error-msg">{{ $message }}</div>
                 @enderror
+            </div>
+
+            <div class="form-group">
+                <label for="notes" class="form-label">Notes (Optional)</label>
+                <textarea id="notes" name="notes" rows="2" class="form-control">{{ old('notes', $expense->notes) }}</textarea>
+                @error('notes')<div class="error-msg">{{ $message }}</div>@enderror
             </div>
 
             <div style="display: flex; gap: 1rem; align-items: center; margin-top: 1.5rem;">

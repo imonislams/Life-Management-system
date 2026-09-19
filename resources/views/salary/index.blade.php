@@ -2,13 +2,13 @@
     <x-slot name="title">Salary Management - Personal Finance Management System</x-slot>
     <x-slot name="pageTitle">Salary Management</x-slot>
 
-    @if (session('status'))
-        <div class="alert-success">
-            {{ session('status') }}
-        </div>
-    @endif
+        @if (session('status'))
+            <div class="alert-success">
+                {{ session('status') }}
+            </div>
+        @endif
 
-    <div class="card" style="margin-bottom: 1.5rem;">
+<div class="card" style="margin-bottom: 1.5rem;">
         <div class="card-header-flex">
             <div>
                 <h1 class="card-title">Salary Management</h1>
@@ -24,7 +24,7 @@
             <div class="summary-card">
                 <div class="summary-card-title">Monthly Salary</div>
                 <div class="summary-card-value balance-color">
-                    ৳ {{ number_format($totalActiveSalary, 2) }} TK
+                    <x-money :amount="$totalActiveSalary" />
                 </div>
             </div>
 
@@ -62,6 +62,7 @@
                     <thead>
                         <tr>
                             <th>Monthly Salary</th>
+                            <th>Currency</th>
                             <th>Payment Day</th>
                             <th>Description</th>
                             <th>Status</th>
@@ -72,7 +73,16 @@
                     <tbody>
                         @foreach ($salaries as $record)
                             <tr>
-                                <td class="text-amount-income">৳ {{ number_format($record->amount, 2) }} TK</td>
+                                <td class="text-amount-income"><x-money :amount="$record->amount" :currency="$record->currency" /></td>
+                                <td>
+                                    @if($record->currency)
+                                        <span class="badge badge-active">{{ $record->currency->code }}</span>
+                                    @elseif($record->currency_code)
+                                        <span class="badge badge-inactive">{{ $record->currency_code }}</span>
+                                    @else
+                                        <span style="color: #94a3b8; font-style: italic;">—</span>
+                                    @endif
+                                </td>
                                 <td>
                                     @if ($record->payment_day)
                                         Day {{ $record->payment_day }} of month
@@ -88,11 +98,15 @@
                                         <span class="badge badge-inactive">Inactive</span>
                                     @endif
                                 </td>
-                                <td>{{ $record->created_at ? $record->created_at->format('M d, Y') : '-' }}</td>
+                                <td>{{ $record->created_at ? user_date($record->created_at) : '-' }}</td>
                                 <td style="text-align: right;">
                                     <div class="action-buttons" style="justify-content: flex-end;">
                                         <a href="{{ route('salary.edit', $record) }}" class="btn-secondary btn-sm">Edit</a>
-                                        <form method="POST" action="{{ route('salary.destroy', $record) }}" onsubmit="return confirm('Are you sure you want to delete this salary record?');">
+                                        <form method="POST" action="{{ route('salary.destroy', $record) }}"
+                                              data-confirm
+                                              data-confirm-title="Delete salary record?"
+                                              data-confirm-message="Are you sure you want to delete this salary record? This action cannot be undone."
+                                              data-confirm-action="Delete">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn-danger-sm btn-sm">Delete</button>
